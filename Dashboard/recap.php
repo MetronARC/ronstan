@@ -108,7 +108,7 @@
     <!-- xlsx library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
 
-    <div class="container">
+    <div class="container" data-aos="zoom-out">
         <!-- SIDEBAR -->
         <aside>
             <div class="top">
