@@ -493,7 +493,8 @@
                         const usagePercentage = (totalArcTimeInSeconds / totalSecondsInDay) * 100;
 
                         // Update the usage percentage in the UI
-                        document.querySelector('.sales h2').textContent = `${usagePercentage.toFixed(2)}%`;
+                        document.querySelector('.sales h2').textContent = `${(totalArcTimeInSeconds / 86400 * 100).toFixed(2)}%`;
+                        console.log('Total Arc Time in Seconds:', data.totalArcTime);
                     }
 
                 } catch (error) {
