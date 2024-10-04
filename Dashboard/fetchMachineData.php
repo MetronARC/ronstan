@@ -25,14 +25,30 @@ try {
         throw new Exception("Connection failed: " . $conn->connect_error);
     }
 
-    // Prepare SQL statement to fetch the ArcTotal for the specific MachineID and Date
+    // Step 1: Look up the MachineID using the realName (machineName)
+    $sql = "SELECT machineID FROM machine WHERE realName = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $machineName);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 0) {
+        throw new Exception('No MachineID found for the given realName');
+    }
+    
+    $row = $result->fetch_assoc();
+    $machineID = $row['machineID']; // Extract the machineID
+
+    $stmt->close();
+
+    // Step 2: Use the retrieved MachineID to find the ArcTotal for that specific machine and date
     $sql = "
     SELECT SUM(TIME_TO_SEC(ArcTotal)) AS totalArcTimeInSeconds
     FROM machinehistory1 
     WHERE MachineID = ? AND DATE(Date) = ?";
-
+    
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ss', $machineName, $date);
+    $stmt->bind_param('ss', $machineID, $date);
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
