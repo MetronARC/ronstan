@@ -212,12 +212,7 @@
                             <h2>0%</h2>
                         </div>
                         <div class="progress">
-                            <svg>
-                                <circle cx="42" cy="42" r="36"></circle>
-                            </svg>
-                            <div class="number">
-                                <h3></h3>
-                            </div>
+
                         </div>
                     </div>
                 </div>
