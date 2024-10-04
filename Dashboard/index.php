@@ -223,7 +223,7 @@ $konek->close();
                     <span class="material-symbols-outlined">engineering</span>
                     <div class="middle">
                         <div class="left">
-                            <h3>Machine Up Time Today</h3>
+                            <h3>Machines Up Time Today</h3>
                             <h1 id="ceksensor1"><?php echo $ceksensor1; ?></h1>
                         </div>
                         <div class="progress">
