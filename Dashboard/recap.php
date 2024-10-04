@@ -204,6 +204,22 @@
                         </div>
                     </div>
                 </div>
+                <div class="sales">
+                    <span class="material-symbols-outlined">zoom_in_map</span>
+                    <div class="middle">
+                        <div class="left">
+                            <h3>Usage Percentage (24h)</h3>
+                            <h2>50%</h2>
+                        </div>
+                        <div class="progress">
+                            <svg>
+                                <circle cx="42" cy="42" r="36"></circle>
+                            </svg>
+                            <div class="number">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="recent-orders">
                 <div id="chart-container">
