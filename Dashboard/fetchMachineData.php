@@ -27,32 +27,32 @@ try {
 
     // Prepare SQL statement to fetch the ArcTotal for the specific MachineID and Date
     $sql = "
-        SELECT TIME_TO_SEC(ArcTotal) AS ArcTotalInSeconds
-        FROM machinehistory1 
-        WHERE MachineID = ? AND DATE(Date) = ?";
-
+    SELECT ArcTotal, TIME_TO_SEC(ArcTotal) AS ArcTotalInSeconds
+    FROM machinehistory1 
+    WHERE MachineID = ? AND DATE(Date) = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('ss', $machineName, $date);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Sum the ArcTotalInSeconds
     $totalArcTimeInSeconds = 0;
+    $arcData = [];
+
     while ($row = $result->fetch_assoc()) {
+        $arcData[] = $row; // Collect all rows for debugging
         $totalArcTimeInSeconds += (int)$row['ArcTotalInSeconds'];
     }
 
     $stmt->close();
     $conn->close();
 
-    // Return the totalArcTimeInSeconds to the front-end
+    // Log the data for debugging
     echo json_encode([
+        'arcData' => $arcData, // All rows fetched
         'totalArcTime' => $totalArcTimeInSeconds
     ]);
-
 } catch (Exception $e) {
     // Handle error
     echo json_encode(['error' => $e->getMessage()]);
     http_response_code(400);
 }
-?>

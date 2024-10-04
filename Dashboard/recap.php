@@ -457,6 +457,7 @@
     </script>
 
     <script>
+        // Example in your JavaScript
         document.getElementById('fetch-data').addEventListener('click', async function(event) {
             event.preventDefault();
 
@@ -483,12 +484,17 @@
 
                     const data = await response.json();
 
-                    // Assuming data contains the total ArcTotal in seconds
-                    const totalArcTime = data.totalArcTime; // Total ArcTotal in seconds
-                    const percentage = calculateUsagePercentage(totalArcTime);
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        // Convert totalArcTime (in seconds) to usage percentage
+                        const totalArcTimeInSeconds = data.totalArcTime;
+                        const totalSecondsInDay = 24 * 60 * 60; // 86,400 seconds in 24 hours
+                        const usagePercentage = (totalArcTimeInSeconds / totalSecondsInDay) * 100;
 
-                    // Update the usage percentage in the UI
-                    document.querySelector('.sales h2').textContent = `${percentage}%`;
+                        // Update the usage percentage in the UI
+                        document.querySelector('.sales h2').textContent = `${usagePercentage.toFixed(2)}%`;
+                    }
 
                 } catch (error) {
                     console.error('Error:', error);
@@ -498,13 +504,6 @@
                 alert('Please select a machine and date.');
             }
         });
-
-        // Function to calculate the percentage
-        function calculateUsagePercentage(totalArcTime) {
-            const totalSecondsInDay = 24 * 60 * 60; // Total seconds in 24 hours
-            const usagePercentage = (totalArcTime / totalSecondsInDay) * 100;
-            return usagePercentage.toFixed(2); // Round to 2 decimal places
-        }
     </script>
 </body>
 
