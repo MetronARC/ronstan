@@ -455,6 +455,57 @@
             return moment(date + ' ' + time, 'YYYY-MM-DD HH:mm').toDate();
         }
     </script>
+
+    <script>
+        document.getElementById('fetch-data').addEventListener('click', async function(event) {
+            event.preventDefault();
+
+            const machineDropdown = document.getElementById('machine-dropdown');
+            const dateInput = document.getElementById('date-input');
+
+            const machineName = machineDropdown.value;
+            const date = dateInput.value;
+
+            if (machineName && date) {
+                try {
+                    const response = await fetch('fetchMachineData.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            machineName: machineName,
+                            date: date
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Error fetching data');
+
+                    const data = await response.json();
+
+                    // Assuming data contains the total ArcTotal in seconds
+                    const totalArcTime = data.totalArcTime; // Total ArcTotal in seconds
+                    const percentage = calculateUsagePercentage(totalArcTime);
+
+                    // Update the usage percentage in the UI
+                    document.querySelector('.sales h2').textContent = `${percentage}%`;
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to fetch or process the data.');
+                }
+            } else {
+                alert('Please select a machine and date.');
+            }
+        });
+
+        // Function to calculate the percentage
+        function calculateUsagePercentage(totalArcTime) {
+            const totalSecondsInDay = 24 * 60 * 60; // Total seconds in 24 hours
+            const usagePercentage = (totalArcTime / totalSecondsInDay) * 100;
+            return usagePercentage.toFixed(2); // Round to 2 decimal places
+        }
+    </script>
 </body>
 
 </html>
