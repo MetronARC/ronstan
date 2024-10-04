@@ -143,7 +143,7 @@
         <!-- END OF SIDEBAR -->
 
         <main data-aos="zoom-out">
-            <h1>Machine Recap</h1>
+            <h1>Machine Recapitulation</h1>
             <div class="date"></div>
             <div class="insights">
                 <!-- ACTIVE AREA -->
