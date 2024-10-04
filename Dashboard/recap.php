@@ -95,7 +95,7 @@
     </style>
 </head>
 
-<body data-aos="zoom-out">
+<body>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Moment.js -->
@@ -142,7 +142,7 @@
         </aside>
         <!-- END OF SIDEBAR -->
 
-        <main>
+        <main data-aos="zoom-out">
             <h1>Machine Recap</h1>
             <div class="date"></div>
             <div class="insights">
@@ -239,7 +239,7 @@
                 </div>
                 <div class="profile">
                     <div class="info">
-                        <p>Hey, <b>Metronarc</b></p>
+                        <p>Hey, <b>Ronstan</b></p>
                         <small class="text-muted">Admin</small>
                     </div>
                     <div class="profile-photo">
