@@ -32,16 +32,28 @@ if ($result->num_rows > 0) {
     $machineID = $row['machineID'];
 
     // Query to fetch data based on machineID and date
-    $sql = "SELECT ArcOn, ArcOff FROM machinehistory1 WHERE MachineID = ? AND Date = ?";
+    $sql = "SELECT TIME_TO_SEC(ArcTotal) AS ArcTotalInSeconds FROM machinehistory1 WHERE MachineID = ? AND DATE(Operated_at) = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $machineID, $date);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    $data = [];
+    $totalArcTimeInSeconds = 0;
+
+    // Sum up the ArcTotal times in seconds
     while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
+        $totalArcTimeInSeconds += (int)$row['ArcTotalInSeconds'];
     }
+
+    // Calculate percentage usage for the day (24 hours = 86400 seconds)
+    $totalSecondsInDay = 24 * 60 * 60;
+    $usagePercentage = ($totalArcTimeInSeconds / $totalSecondsInDay) * 100;
+
+    // Prepare data for response
+    $data = [
+        'totalArcTime' => gmdate("H:i:s", $totalArcTimeInSeconds),
+        'usagePercentage' => round($usagePercentage, 2) // Round to 2 decimal places
+    ];
 } else {
     $data = ['error' => 'Machine not found'];
 }

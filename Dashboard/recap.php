@@ -209,7 +209,7 @@
                     <div class="middle">
                         <div class="left">
                             <h3>Usage Percentage (24h)</h3>
-                            <h2>50%</h2>
+                            <h2>0%</h2>
                         </div>
                         <div class="progress">
                             <svg>
@@ -266,24 +266,44 @@
             const date = dateInput.value;
 
             if (machineName && date) {
-                const response = await fetch('fetchData.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        machineName: machineName,
-                        date: date
-                    })
-                });
-                const data = await response.json();
+                try {
+                    const response = await fetch('fetchData.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            machineName: machineName,
+                            date: date
+                        })
+                    });
 
-                // Render the chart with the fetched data and user-selected date
-                renderChart(data, date);
+                    if (!response.ok) throw new Error('Error fetching data');
+
+                    const data = await response.json();
+
+                    // Assuming data contains the total ArcTotal in seconds
+                    const totalArcTime = data.totalArcTime; // Total ArcTotal in seconds
+                    const percentage = calculateUsagePercentage(totalArcTime);
+
+                    // Update the usage percentage in the UI
+                    document.querySelector('.sales h2').textContent = `${percentage}%`;
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to fetch or process the data.');
+                }
             } else {
                 alert('Please select a machine and date.');
             }
         });
+
+        // Function to calculate the percentage
+        function calculateUsagePercentage(totalArcTime) {
+            const totalSecondsInDay = 24 * 60 * 60; // Total seconds in 24 hours
+            const usagePercentage = (totalArcTime / totalSecondsInDay) * 100;
+            return usagePercentage.toFixed(2); // Round to 2 decimal places
+        }
 
         document.getElementById('reset-zoom').addEventListener('click', function() {
             if (chartInstance) {
