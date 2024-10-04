@@ -467,6 +467,8 @@
             const machineName = machineDropdown.value;
             const date = dateInput.value;
 
+            console.log('Selected Date:', date);  // Should print YYYY-MM-DD
+
             if (machineName && date) {
                 try {
                     const response = await fetch('fetchMachineData.php', {
