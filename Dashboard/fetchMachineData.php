@@ -29,7 +29,7 @@ try {
     $sql = "
         SELECT TIME_TO_SEC(ArcTotal) AS ArcTotalInSeconds
         FROM machinehistory1 
-        WHERE MachineID = ? AND DATE(Operated_at) = ?";
+        WHERE MachineID = ? AND DATE(Date) = ?";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('ss', $machineName, $date);
