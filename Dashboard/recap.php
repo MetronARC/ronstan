@@ -209,7 +209,7 @@
                     <div class="middle">
                         <div class="left">
                             <h3>Usage Percentage (24h)</h3>
-                            <h2>50%</h2>
+                            <h2>0%</h2>
                         </div>
                         <div class="progress">
                             <svg>
