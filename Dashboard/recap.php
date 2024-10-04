@@ -95,7 +95,7 @@
     </style>
 </head>
 
-<body>
+<body data-aos="zoom-out">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Moment.js -->
@@ -109,7 +109,7 @@
     <!-- xlsx library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
 
-    <div class="container" data-aos="zoom-out">
+    <div class="container">
         <!-- SIDEBAR -->
         <aside>
             <div class="top">
