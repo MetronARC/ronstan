@@ -92,6 +92,14 @@
             right: 110px;
             /* Adjust to position it correctly */
         }
+
+        .datetime-input {
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
@@ -226,7 +234,7 @@
                     <div class="middle">
                         <div class="left">
                             <h3>Usage Percentage (24h)</h3>
-                            <input type="text" name="datetimes" />
+                            <input type="text" name="datetimes" class="datetime-input" />
                             <h2>0%</h2>
                         </div>
                         <div class="progress">
