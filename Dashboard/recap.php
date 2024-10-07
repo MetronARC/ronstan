@@ -235,10 +235,14 @@
                         <div class="left">
                             <h3>Usage Percentage (24h)</h3>
                             <input type="text" name="datetimes" class="datetime-input" />
-                            <h2>0%</h2>
                         </div>
                         <div class="progress">
-
+                            <svg>
+                                <circle cx="42" cy="42" r="36"></circle>
+                            </svg>
+                            <div class="number">
+                                <h2>0%</h2>
+                            </div>
                         </div>
                     </div>
                 </div>
