@@ -226,7 +226,7 @@
                     <div class="middle">
                         <div class="left">
                             <h3>Usage Percentage (24h)</h3>
-                            <h3>Select Interval: <input type="text" name="datetimes" /></h3>
+                            <input type="text" name="datetimes" />
                             <h2>0%</h2>
                         </div>
                         <div class="progress">
