@@ -95,7 +95,7 @@
 
         .datetime-input {
             border: 1px solid #ccc;
-            padding: 10px;
+            padding: 7px;
             font-size: 16px;
             width: 100%;
             box-sizing: border-box;
@@ -241,7 +241,7 @@
                                 <circle cx="42" cy="42" r="36"></circle>
                             </svg>
                             <div class="number">
-                                <h2>0%</h2>
+                                <h3>0%</h3>
                             </div>
                         </div>
                     </div>
@@ -514,7 +514,7 @@
 
                     // Calculate usage percentage and update the UI
                     const usagePercentage = data.usagePercentage.toFixed(2); // Get the percentage from the response
-                    document.querySelector('.sales h2').textContent = `${usagePercentage}%`; // Update the h2 element
+                    document.querySelector('.sales h3').textContent = `${usagePercentage}%`; // Update the h2 element
                 } catch (error) {
                     console.error('Error:', error);
                     alert('Failed to fetch or process the data.');
