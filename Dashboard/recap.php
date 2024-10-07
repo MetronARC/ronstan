@@ -512,9 +512,11 @@
 
                     const data = await response.json();
 
-                    // Calculate usage percentage and update the UI
+                    // Calculate usage percentage and update the specific h3 in the number div inside the correct sales div
                     const usagePercentage = data.usagePercentage.toFixed(2); // Get the percentage from the response
-                    document.querySelector('.sales h3').textContent = `${usagePercentage}%`; // Update the h2 element
+
+                    // Update only the specific h3 tag inside the correct sales div
+                    document.querySelector('.sales:nth-of-type(3) .number h3').textContent = `${usagePercentage}%`; // Targets the 3rd .sales div
                 } catch (error) {
                     console.error('Error:', error);
                     alert('Failed to fetch or process the data.');
