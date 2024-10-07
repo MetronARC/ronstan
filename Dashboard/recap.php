@@ -500,7 +500,9 @@
 
                     const data = await response.json();
 
-                    // Calculate usage percentage and update the UI as you did before
+                    // Calculate usage percentage and update the UI
+                    const usagePercentage = data.usagePercentage.toFixed(2); // Get the percentage from the response
+                    document.querySelector('.sales h2').textContent = `${usagePercentage}%`; // Update the h2 element
                 } catch (error) {
                     console.error('Error:', error);
                     alert('Failed to fetch or process the data.');
