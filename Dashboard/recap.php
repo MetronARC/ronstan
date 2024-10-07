@@ -108,6 +108,22 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
     <!-- xlsx library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <script
+        type="text/javascript"
+        src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script
+        type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <title>Time Range Picker</title>
+    <style>
+        input[type="text"] {
+            cursor: text;
+        }
+    </style>
 
     <div class="container">
         <!-- SIDEBAR -->
@@ -210,6 +226,7 @@
                     <div class="middle">
                         <div class="left">
                             <h3>Usage Percentage (24h)</h3>
+                            <h3>Select Interval: <input type="text" name="datetimes" /></h3>
                             <h2>0%</h2>
                         </div>
                         <div class="progress">
@@ -221,7 +238,6 @@
             <div class="recent-orders">
                 <div id="chart-container">
                     <canvas id="chart"></canvas>
-                    <!-- Reset Zoom and Move Buttons -->
                     <button id="reset-zoom">Reset Zoom</button>
                     <button id="move-left">Move Left</button>
                     <button id="move-right">Move Right</button>
@@ -464,7 +480,7 @@
             const machineName = machineDropdown.value;
             const date = dateInput.value;
 
-            console.log('Selected Date:', date);  // Should print YYYY-MM-DD
+            console.log('Selected Date:', date); // Should print YYYY-MM-DD
 
             if (machineName && date) {
                 try {
@@ -503,6 +519,32 @@
             } else {
                 alert('Please select a machine and date.');
             }
+        });
+    </script>
+
+    <script>
+        $(function() {
+            $('input[name="datetimes"]').daterangepicker({
+                timePicker: true,
+                timePicker24Hour: true,
+                timePickerIncrement: 1, // Allows manual minute input
+                locale: {
+                    format: 'hh:mm A',
+                    separator: ' to ', // Separator between start and end time
+                },
+                autoApply: true,
+                showDropdowns: true,
+                opens: 'center',
+                startDate: moment().startOf('day').hours(6),
+                endDate: moment().endOf('day').hours(23).minutes(59),
+            }).on('show.daterangepicker', function(ev, picker) {
+                picker.container.find('.calendar-table').hide(); // Hide the calendar
+            });
+
+            // Enable manual input for the time picker
+            $('input[name="datetimes"]').on('focus', function() {
+                $(this).prop('readonly', false); // Make input editable
+            });
         });
     </script>
 </body>
