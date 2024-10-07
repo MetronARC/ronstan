@@ -470,17 +470,16 @@
     </script>
 
     <script>
-        // Example in your JavaScript
         document.getElementById('fetch-data').addEventListener('click', async function(event) {
             event.preventDefault();
 
             const machineDropdown = document.getElementById('machine-dropdown');
-            const dateInput = document.getElementById('date-input');
-
             const machineName = machineDropdown.value;
-            const date = dateInput.value;
+            const date = document.getElementById('date-input').value; // Date from the date input
 
-            console.log('Selected Date:', date); // Should print YYYY-MM-DD
+            const timeRange = $('input[name="datetimes"]').data('daterangepicker');
+            const startTime = timeRange.startDate.format('HH:mm'); // Extract start time (e.g., "06:00")
+            const endTime = timeRange.endDate.format('HH:mm'); // Extract end time (e.g., "23:59")
 
             if (machineName && date) {
                 try {
@@ -491,7 +490,9 @@
                         },
                         body: JSON.stringify({
                             machineName: machineName,
-                            date: date
+                            date: date,
+                            startTime: startTime,
+                            endTime: endTime
                         })
                     });
 
@@ -499,25 +500,13 @@
 
                     const data = await response.json();
 
-                    if (data.error) {
-                        alert(data.error);
-                    } else {
-                        // Convert totalArcTime (in seconds) to usage percentage
-                        const totalArcTimeInSeconds = data.totalArcTime;
-                        const totalSecondsInDay = 24 * 60 * 60; // 86,400 seconds in 24 hours
-                        const usagePercentage = (totalArcTimeInSeconds / totalSecondsInDay) * 100;
-
-                        // Update the usage percentage in the UI
-                        document.querySelector('.sales h2').textContent = `${(totalArcTimeInSeconds / 86400 * 100).toFixed(2)}%`;
-                        console.log('Total Arc Time in Seconds:', data.totalArcTime);
-                    }
-
+                    // Calculate usage percentage and update the UI as you did before
                 } catch (error) {
                     console.error('Error:', error);
                     alert('Failed to fetch or process the data.');
                 }
             } else {
-                alert('Please select a machine and date.');
+                alert('Please select a machine, date, and time range.');
             }
         });
     </script>
