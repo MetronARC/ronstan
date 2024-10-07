@@ -233,7 +233,7 @@
                     <span class="material-symbols-outlined">zoom_in_map</span>
                     <div class="middle">
                         <div class="left">
-                            <h2>Usage Percentage</h2>
+                            <h3>Usage Percentage</h3>
                             <input type="text" name="datetimes" class="datetime-input" />
                         </div>
                         <div class="progress">
