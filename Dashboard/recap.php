@@ -219,20 +219,6 @@
                     <span class="material-symbols-outlined">zoom_in_map</span>
                     <div class="middle">
                         <div class="left">
-                            <h3>Input Date</h3>
-                            <input type="date" id="date-input" class="date-input">
-                        </div>
-                        <div class="progress">
-                            <a id="fetch-data" href="#">
-                                <p>Enter</p>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="sales">
-                    <span class="material-symbols-outlined">zoom_in_map</span>
-                    <div class="middle">
-                        <div class="left">
                             <h3>Usage Percentage</h3>
                             <input type="text" name="datetimes" class="datetime-input" />
                         </div>
@@ -243,6 +229,20 @@
                             <div class="number">
                                 <h3>0%</h3>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sales">
+                    <span class="material-symbols-outlined">zoom_in_map</span>
+                    <div class="middle">
+                        <div class="left">
+                            <h3>Input Date</h3>
+                            <input type="date" id="date-input" class="date-input">
+                        </div>
+                        <div class="progress">
+                            <a id="fetch-data" href="#">
+                                <p>Enter</p>
+                            </a>
                         </div>
                     </div>
                 </div>
