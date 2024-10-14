@@ -2,16 +2,10 @@
 // Start the session
 session_start();
 
-// Assuming you have a database connection
-$servername = "localhost";
-$username = "u558841402_ronstan";
-$password = "2468g0a7A7B7*";
-$dbname = "u558841402_ronstandb";
+include "koneksi.php";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($konek->connect_error) {
+    die("Connection failed: " . $konek->connect_error);
 }
 
 // Handle form submission
@@ -22,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Perform a simple query to check credentials
     $sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-    $stmt = $conn->prepare($sql);
+    $stmt = $konek->prepare($sql);
     $stmt->bind_param("ss", $email, $password);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -38,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Save the token in the database
             $sql = "UPDATE users SET remember_me_token = ? WHERE email = ?";
-            $stmt = $conn->prepare($sql);
+            $stmt = $konek->prepare($sql);
             $stmt->bind_param("ss", $token, $email);
             $stmt->execute();
         }
@@ -53,5 +47,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-$conn->close();
+$konek->close();
 ?>

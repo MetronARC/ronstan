@@ -181,22 +181,16 @@
                                 <!-- Options will be dynamically added here -->
                                 <?php
                                 // Database connection details
-                                $servername = "localhost";
-                                $username = "u558841402_ronstan";
-                                $password = "2468g0a7A7B7*";
-                                $dbname = "u558841402_ronstandb";
-
-                                // Create connection
-                                $conn = new mysqli($servername, $username, $password, $dbname);
+                                include "koneksi.php";
 
                                 // Check connection
-                                if ($conn->connect_error) {
-                                    die("Connection failed: " . $conn->connect_error);
+                                if ($konek->connect_error) {
+                                    die("Connection failed: " . $konek->connect_error);
                                 }
 
                                 // Fetch data from the machine table
                                 $sql = "SELECT realName FROM machine";
-                                $result = $conn->query($sql);
+                                $result = $konek->query($sql);
 
                                 if ($result->num_rows > 0) {
                                     while ($row = $result->fetch_assoc()) {
@@ -206,7 +200,7 @@
                                     echo '<option value="">No machines available</option>';
                                 }
 
-                                $conn->close();
+                                $konek->close();
                                 ?>
                             </select>
                         </div>

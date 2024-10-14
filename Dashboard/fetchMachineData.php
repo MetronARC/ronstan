@@ -14,19 +14,15 @@ try {
     $endTime = $input['endTime'];
 
     // Database connection details
-    $servername = "localhost";
-    $username = "u558841402_ronstan";
-    $password = "2468g0a7A7B7*";
-    $dbname = "u558841402_ronstandb";
+    include "koneksi.php";
 
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    if ($conn->connect_error) {
-        throw new Exception("Connection failed: " . $conn->connect_error);
+    if ($konek->connect_error) {
+        throw new Exception("Connection failed: " . $konek->connect_error);
     }
 
     // Step 1: Look up the MachineID using the realName
     $sql = "SELECT machineID FROM machine WHERE realName = ?";
-    $stmt = $conn->prepare($sql);
+    $stmt = $konek->prepare($sql);
     $stmt->bind_param("s", $machineName);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -48,7 +44,7 @@ try {
     AND ArcOn >= ? 
     AND ArcOff <= ?";
     
-    $stmt = $conn->prepare($sql);
+    $stmt = $konek->prepare($sql);
     $stmt->bind_param('ssss', $machineID, $date, $startTime, $endTime);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -56,7 +52,7 @@ try {
 
     $totalArcTimeInSeconds = (int)$row['totalArcTimeInSeconds'];
     $stmt->close();
-    $conn->close();
+    $konek->close();
 
     // Step 3: Calculate the total seconds in the given time range
     $startDateTime = new DateTime($date . ' ' . $startTime);

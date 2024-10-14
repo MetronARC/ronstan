@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,22 +9,17 @@
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
+
 <body data-aos="zoom-in">
 
     <?php
     // Start the session
     session_start();
 
-    // Assuming you have a database connection
-    $servername = "localhost";
-    $username = "u558841402_ronstan";
-    $password = "2468g0a7A7B7*";
-    $dbname = "u558841402_ronstandb";
+    include "koneksi.php";
 
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+    if ($konek->connect_error) {
+        die("Connection failed: " . $konek->connect_error);
     }
 
     // Check if the user is already authenticated or if a valid remember me token exists
@@ -33,7 +29,7 @@
     } elseif (isset($_COOKIE["remember_me_token"])) {
         $token = $_COOKIE["remember_me_token"];
         $sql = "SELECT * FROM users WHERE remember_me_token = ?";
-        $stmt = $conn->prepare($sql);
+        $stmt = $konek->prepare($sql);
         $stmt->bind_param("s", $token);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -46,7 +42,7 @@
         }
     }
 
-    $conn->close();
+    $konek->close();
     ?>
 
     <!-- Navigation Bar -->
@@ -91,4 +87,5 @@
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
+
 </html>
