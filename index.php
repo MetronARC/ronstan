@@ -16,7 +16,7 @@
     // Start the session
     session_start();
 
-    include "koneksi.php";
+    include "Dashboard/koneksi.php";
 
     if ($konek->connect_error) {
         die("Connection failed: " . $konek->connect_error);
