@@ -76,6 +76,7 @@ if (empty($weldID)) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,7 +87,7 @@ if (empty($weldID)) {
     <!-- Stylesheet -->
     <link rel="stylesheet" href="../../../styles/index.css">
     <title>SPARC Monitoring Dashboard</title>
-    
+
     <style>
         #inside {
             display: inline-block;
@@ -97,6 +98,7 @@ if (empty($weldID)) {
         }
     </style>
 </head>
+
 <body>
     <script>
         var timeout = <?php echo $timeout; ?>; // Set the initial timeout value in seconds
@@ -128,7 +130,7 @@ if (empty($weldID)) {
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
-        <div class="container">
+    <div class="container">
         <!-- SIDEBAR -->
         <aside>
             <div class="top">
@@ -149,7 +151,7 @@ if (empty($weldID)) {
                     <span class="material-symbols-outlined">badge</span>
                     <h3>Machine Recap</h3>
                 </a>
-                <a href="../../../monitoring.php"  class="active">
+                <a href="../../../monitoring.php" class="active">
                     <span class="material-symbols-outlined">bar_chart_4_bars</span>
                     <h3>Monitoring</h3>
                 </a>
@@ -170,7 +172,7 @@ if (empty($weldID)) {
             <div class="insights">
                 <!-- ACTIVE AREA -->
                 <div class="sales">
-                <span class="material-symbols-outlined">badge</span>
+                    <span class="material-symbols-outlined">badge</span>
                     <div class="middle">
                         <div class="left">
                             <h3>UID</h3>
@@ -186,14 +188,14 @@ if (empty($weldID)) {
                 <!-- END OF ACTIVE AREA -->
                 <!-- MOST USED MACHINE -->
                 <div class="expenses">
-                <span class="material-symbols-outlined">schedule</span>
+                    <span class="material-symbols-outlined">schedule</span>
                     <div class="middle">
                         <div class="left">
                             <h3>Up Time</h3>
                             <h1 id="ceksensor3"><?php echo $ceksensor3; ?></h1>
                         </div>
                         <div class="progress">
-                        <img src="images/time.png">
+                            <img src="images/time.png">
                             <div class="number">
                             </div>
                         </div>
@@ -209,7 +211,7 @@ if (empty($weldID)) {
                             <h1 id="ceksensor1"><?php echo $ceksensor1; ?></h1>
                         </div>
                         <div class="progress">
-                        <img src="images/mode.png">
+                            <img src="images/mode.png">
                             <div class="number">
                             </div>
                         </div>
@@ -220,110 +222,108 @@ if (empty($weldID)) {
             <!-- END OF INSIGHTS -->
 
             <div class="recent-orders">
-            <div>
-    <!--<canvas id="myChart" style="height: 130px;"></canvas>-->
+                <div>
+                    <!--<canvas id="myChart" style="height: 130px;"></canvas>-->
 
-</div>
+                </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
-$(document).ready(function(){
-    var ctx = document.getElementById('myChart');
-    var myChart;
-    var initialData;
+                <script>
+                    $(document).ready(function() {
+                        var ctx = document.getElementById('myChart');
+                        var myChart;
+                        var initialData;
 
-    $.ajax({
-        url: 'getArcOnOff.php',
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            console.log('Received data:', data);
-            initialData = data;
-            createChart(data);
-        },
-        error: function (xhr, status, error) {
-            console.error('Error fetching chart data:', error);
-        }
-    });
-
-    function createChart(data) {
-        var maxValues = data.map(entry => Math.max(entry.CurrentDC, entry.Voltage));
-
-        myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.map(entry => entry.WeldID),
-                datasets: [
-                    {
-                        label: 'Current and Voltage',
-                        data: maxValues,
-                        backgroundColor: 'transparent' // Transparent background, we'll draw manually
-                    }
-                ]
-            },
-            options: {
-                scales: {
-                    x: {
-                        stacked: true
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                var dataIndex = context.dataIndex;
-                                var dataEntry = data[dataIndex];
-                                return [
-                                    `Current DC: ${dataEntry.CurrentDC}`,
-                                    `Voltage: ${dataEntry.Voltage}`,
-                                    `WeldID: ${dataEntry.WeldID}`,
-                                    `ArcOn: ${dataEntry.ArcOn}`,
-                                    `ArcOff: ${dataEntry.ArcOff}`
-                                ];
+                        $.ajax({
+                            url: 'getArcOnOff.php',
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function(data) {
+                                console.log('Received data:', data);
+                                initialData = data;
+                                createChart(data);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error fetching chart data:', error);
                             }
+                        });
+
+                        function createChart(data) {
+                            var maxValues = data.map(entry => Math.max(entry.CurrentDC, entry.Voltage));
+
+                            myChart = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: data.map(entry => entry.WeldID),
+                                    datasets: [{
+                                        label: 'Current and Voltage',
+                                        data: maxValues,
+                                        backgroundColor: 'transparent' // Transparent background, we'll draw manually
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        x: {
+                                            stacked: true
+                                        },
+                                        y: {
+                                            stacked: true,
+                                            beginAtZero: true
+                                        }
+                                    },
+                                    plugins: {
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    var dataIndex = context.dataIndex;
+                                                    var dataEntry = data[dataIndex];
+                                                    return [
+                                                        `Current DC: ${dataEntry.CurrentDC}`,
+                                                        `Voltage: ${dataEntry.Voltage}`,
+                                                        `WeldID: ${dataEntry.WeldID}`,
+                                                        `ArcOn: ${dataEntry.ArcOn}`,
+                                                        `ArcOff: ${dataEntry.ArcOff}`
+                                                    ];
+                                                }
+                                            }
+                                        }
+                                    },
+                                    animation: {
+                                        duration: 0
+                                    }
+                                },
+                                plugins: [{
+                                    beforeDraw: function(chart) {
+                                        var ctx = chart.ctx;
+                                        var yAxis = chart.scales['y'];
+                                        var xAxis = chart.scales['x'];
+
+                                        chart.data.datasets[0].data.forEach((value, index) => {
+                                            var meta = chart.getDatasetMeta(0).data[index];
+                                            var barBottom = yAxis.getPixelForValue(0);
+                                            var barTop = yAxis.getPixelForValue(value);
+
+                                            // Draw Current DC
+                                            var currentHeight = yAxis.getPixelForValue(0) - yAxis.getPixelForValue(data[index].CurrentDC);
+                                            ctx.fillStyle = 'blue';
+                                            ctx.fillRect(meta.x - meta.width / 2, barBottom - currentHeight, meta.width, currentHeight);
+
+                                            // Draw Voltage
+                                            var voltageHeight = yAxis.getPixelForValue(0) - yAxis.getPixelForValue(data[index].Voltage);
+                                            ctx.fillStyle = 'yellow';
+                                            ctx.fillRect(meta.x - meta.width / 2, barBottom - voltageHeight, meta.width, voltageHeight);
+                                        });
+                                    }
+                                }]
+                            });
                         }
-                    }
-                },
-                animation: {
-                    duration: 0
-                }
-            },
-            plugins: [{
-                beforeDraw: function(chart) {
-                    var ctx = chart.ctx;
-                    var yAxis = chart.scales['y'];
-                    var xAxis = chart.scales['x'];
-
-                    chart.data.datasets[0].data.forEach((value, index) => {
-                        var meta = chart.getDatasetMeta(0).data[index];
-                        var barBottom = yAxis.getPixelForValue(0);
-                        var barTop = yAxis.getPixelForValue(value);
-
-                        // Draw Current DC
-                        var currentHeight = yAxis.getPixelForValue(0) - yAxis.getPixelForValue(data[index].CurrentDC);
-                        ctx.fillStyle = 'blue';
-                        ctx.fillRect(meta.x - meta.width / 2, barBottom - currentHeight, meta.width, currentHeight);
-
-                        // Draw Voltage
-                        var voltageHeight = yAxis.getPixelForValue(0) - yAxis.getPixelForValue(data[index].Voltage);
-                        ctx.fillStyle = 'yellow';
-                        ctx.fillRect(meta.x - meta.width / 2, barBottom - voltageHeight, meta.width, voltageHeight);
                     });
-                }
-            }]
-        });
-    }
-});
-</script>
+                </script>
 
             </div>
         </main>
-            <!-- END OF MAIN -->
+        <!-- END OF MAIN -->
         <div class="right">
             <div class="top">
                 <button id="menu-btn">
@@ -350,20 +350,20 @@ $(document).ready(function(){
                     <!-- Data will be dynamically added here using JavaScript -->
                 </div>
                 <script>
-    $(document).ready(function () {
-        // Function to fetch data from PHP script and update the updates div
-        function fetchWelderData() {
-            $.ajax({
-                url: 'getArcOnOffRight.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    // Clear existing content
-                    $('#welder-updates').empty();
+                    $(document).ready(function() {
+                        // Function to fetch data from PHP script and update the updates div
+                        function fetchWelderData() {
+                            $.ajax({
+                                url: 'getArcOnOffRight.php',
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function(data) {
+                                    // Clear existing content
+                                    $('#welder-updates').empty();
 
-                    // Iterate through data and append to updates div
-                    data.forEach(function (entry) {
-                        $('#welder-updates').append(`
+                                    // Iterate through data and append to updates div
+                                    data.forEach(function(entry) {
+                                        $('#welder-updates').append(`
                             <div class="update">
                                 <div class="profile-photo">
                                     <img src="../../../images/welder.png">
@@ -375,23 +375,26 @@ $(document).ready(function(){
                                 </div>
                             </div>
                         `);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error fetching data:', error);
-                }
-            });
-        }
+                                    });
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Error fetching data:', error);
+                                }
+                            });
+                        }
 
-        // Fetch data initially and set an interval to fetch data every second
-        fetchWelderData();
-        setInterval(fetchWelderData, 1000); // Update every 1 second
-    });
-</script>
+                        // Fetch data initially and set an interval to fetch data every second
+                        fetchWelderData();
+                        setInterval(fetchWelderData, 1000); // Update every 1 second
+                    });
+                </script>
             </div>
             <div class="recent-updates">
                 <div class="updates" id="welder-updates">
-                    <h2>Login Time: <div id="inside"><h2><?php echo $ceksensor5; ?></h2></div></h2>
+                    <h2>Login Time: <div id="inside">
+                            <h2><?php echo $ceksensor5; ?></h2>
+                        </div>
+                    </h2>
                 </div>
             </div>
         </div>
@@ -399,4 +402,5 @@ $(document).ready(function(){
     <script src="../../../js/index.js"></script>
 
 </body>
+
 </html>

@@ -1,3 +1,13 @@
+<?php
+// Get the date from the URL query string
+$date = isset($_GET['date']) ? $_GET['date'] : null;
+
+if (!$date) {
+    echo "<h2>No date provided. Please go back and select a date.</h2>";
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -133,7 +143,7 @@
         }
     </style>
 
-    <div class="container"  data-aos="zoom-out">
+    <div class="container">
         <!-- SIDEBAR -->
         <aside>
             <div class="top">
@@ -169,88 +179,10 @@
         <main>
             <h1>Machine Recapitulation</h1>
             <div class="date"></div>
-            <div class="insights">
-                <!-- ACTIVE AREA -->
-                <div class="sales">
-                    <span class="material-symbols-outlined">zoom_in_map</span>
-                    <div class="middle">
-                        <div class="left">
-                            <h3>Input Machine Name</h3>
-                            <select id="machine-dropdown" class="machine-input">
-                                <option value="" selected disabled>Select your Machine</option>
-                                <!-- Options will be dynamically added here -->
-                                <?php
-                                // Database connection details
-                                include "koneksi.php";
-
-                                // Check connection
-                                if ($konek->connect_error) {
-                                    die("Connection failed: " . $konek->connect_error);
-                                }
-
-                                // Fetch data from the machine table
-                                $sql = "SELECT realName FROM machine";
-                                $result = $konek->query($sql);
-
-                                if ($result->num_rows > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                        echo '<option value="' . htmlspecialchars($row['realName']) . '">' . htmlspecialchars($row['realName']) . '</option>';
-                                    }
-                                } else {
-                                    echo '<option value="">No machines available</option>';
-                                }
-
-                                $konek->close();
-                                ?>
-                            </select>
-                        </div>
-                        <div class="progress">
-                            <!-- Progress bar can remain here -->
-                        </div>
-                    </div>
-                </div>
-                <div class="sales">
-                    <span class="material-symbols-outlined">zoom_in_map</span>
-                    <div class="middle">
-                        <div class="left">
-                            <h3>Input Date</h3>
-                            <input type="date" id="date-input" class="date-input">
-                        </div>
-                        <div class="progress">
-                            <a id="fetch-data" href="#">
-                                <p>Enter</p>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="sales">
-                    <span class="material-symbols-outlined">zoom_in_map</span>
-                    <div class="middle">
-                        <div class="left">
-                            <h3>Usage Percentage</h3>
-                            <input type="text" name="datetimes" class="datetime-input" />
-                        </div>
-                        <div class="progress">
-                            <svg>
-                                <circle cx="42" cy="42" r="36"></circle>
-                            </svg>
-                            <div class="number">
-                                <h3>0%</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="recent-orders">
-                <div id="chart-container">
-                    <canvas id="chart"></canvas>
-                    <button id="reset-zoom">Reset Zoom</button>
-                    <button id="move-left">Move Left</button>
-                    <button id="move-right">Move Right</button>
+                <div id="charts-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
+                    <!-- Charts will be dynamically inserted here -->
                 </div>
-            </div>
-            <div id="charts-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
-                <!-- Charts will be dynamically inserted here -->
             </div>
         </main>
         <div class="right">
@@ -273,75 +205,64 @@
                 </div>
             </div>
             <div class="recent-updates">
-                <h2><br /></h2>
-                <a id="fetch-all-data" href="#">
-                    <div class="updates" id="welder-updates" style="background: blue;">
-                        <h2 style="color: white; font-size: 1.2rem">Generate All Machine Charts</h2>
-                    </div>
-                </a>
+
             </div>
         </div>
     </div>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="js/index.js"></script>
+    <script type="text/javascript">
+        var selectedDate = '<?php echo $date; ?>'; // Get the date from PHP
+        console.log("Selected date for chart: ", selectedDate);
+
+        // Use the selected date to generate charts below
+    </script>
+
     <script>
-        let individualChartInstance = null;
+        document.addEventListener('DOMContentLoaded', function() {
+            // After loading, trigger the chart generation using the selected date
+            if (selectedDate) {
+                // Assume you have a function or logic to fetch chart data
+                fetchChartData(selectedDate); // Use the selected date
+            }
+        });
 
-        document.getElementById('fetch-data').addEventListener('click', async function(event) {
-            event.preventDefault();
-            console.log("Enter button clicked");
-
-            const machineDropdown = document.getElementById('machine-dropdown');
-            const dateInput = document.getElementById('date-input');
-
-            const machineName = machineDropdown.value;
-            const date = dateInput.value;
-
-            if (machineName && date) {
-                const response = await fetch('fetchData.php', {
+        function fetchChartData(date) {
+            // Replace this with your AJAX call or logic to fetch data for charts based on the date
+            fetch('fetchDatas.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        machineName: machineName,
-                        date: date
+                        date: date // Send the selected date to the backend
                     })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Clear previous charts
+                    const chartsContainer = document.getElementById('charts-container');
+                    chartsContainer.innerHTML = ''; // Clear previous charts
+
+                    // Loop through machines and create a new canvas for each
+                    for (const machineName in data) {
+                        const machineData = data[machineName];
+
+                        const canvas = document.createElement('canvas');
+                        canvas.id = `chart-${machineName}`; // Unique ID for each chart
+                        canvas.style.width = '30%'; // Ensures 3 charts per row
+                        canvas.style.height = '100px';
+                        chartsContainer.appendChild(canvas);
+
+                        renderChart(machineData, date, machineName, canvas); // Generate chart
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching chart data:', error);
                 });
-                const data = await response.json();
+        }
 
-                // Render the chart with the fetched data and user-selected date
-                console.log(data); // Log the data received before rendering
-                renderChart(data, date);
-
-            } else {
-                alert('Please select a machine and date.');
-            }
-        });
-
-        document.getElementById('reset-zoom').addEventListener('click', function() {
-            if (chartInstance) {
-                chartInstance.resetZoom();
-            }
-        });
-
-        document.getElementById('move-left').addEventListener('click', function() {
-            if (chartInstance) {
-                chartInstance.pan({
-                    x: 100
-                });
-            }
-        });
-
-        document.getElementById('move-right').addEventListener('click', function() {
-            if (chartInstance) {
-                chartInstance.pan({
-                    x: -100
-                });
-            }
-        });
-
-        function renderChart(data, date) {
+        function renderChart(data, date, machineName, canvas) {
             const dataPoints = [];
             const backgroundColors = [];
             const borderColors = [];
@@ -353,11 +274,11 @@
                 let hoverLabel = '';
 
                 data.forEach(interval => {
-                    if (interval.ArcOn && interval.ArcOff) { // Check if both times are defined
+                    if (interval.ArcOn && interval.ArcOff) {
                         const arcOnTime = timeToMinutes(interval.ArcOn);
                         const arcOffTime = timeToMinutes(interval.ArcOff);
 
-                        if (arcOnTime !== null && arcOffTime !== null) { // Check if conversion was successful
+                        if (arcOnTime !== null && arcOffTime !== null) {
                             if (i >= arcOnTime && i < arcOffTime) {
                                 color = '#008000';
                                 if (i === arcOnTime) {
@@ -365,8 +286,6 @@
                                 }
                             }
                         }
-                    } else {
-                        console.error("Missing ArcOn or ArcOff time in data:", interval);
                     }
                 });
 
@@ -380,31 +299,13 @@
                 hoverLabels.push(hoverLabel);
             }
 
-            const chartContainer = document.getElementById('chart-container');
-            console.log(window.getComputedStyle(chartContainer).display);
-            chartContainer.innerHTML = ''; // Clear any existing canvas
-            const canvas = document.createElement('canvas');
-            canvas.id = 'chart';
-            chartContainer.appendChild(canvas);
-
-
-            // Then proceed to get context and render chart
             const ctx = canvas.getContext('2d');
-            if (!ctx) {
-                console.error('Failed to get canvas context');
-                return;
-            }
 
-
-            if (individualChartInstance) {
-                individualChartInstance.destroy();
-            }
-
-            chartInstance = new Chart(ctx, {
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
                     datasets: [{
-                        label: 'Machine On/Off',
+                        label: `Usage for ${machineName}`,
                         data: dataPoints,
                         backgroundColor: backgroundColors,
                         borderColor: borderColors,
@@ -491,8 +392,7 @@
 
         function timeToMinutes(time) {
             if (!time) {
-                console.error("Invalid time value:", time);
-                return null; // or return a default value like 0 if that makes sense in your context
+                return null;
             }
             const [hours, minutes] = time.split(':').map(Number);
             return hours * 60 + minutes;
@@ -503,93 +403,6 @@
         }
     </script>
 
-    <script>
-        document.getElementById('fetch-data').addEventListener('click', async function(event) {
-            event.preventDefault();
-
-            const machineDropdown = document.getElementById('machine-dropdown');
-            const machineName = machineDropdown.value;
-            const date = document.getElementById('date-input').value; // Date from the date input
-
-            const timeRange = $('input[name="datetimes"]').data('daterangepicker');
-            const startTime = timeRange.startDate.format('HH:mm'); // Extract start time (e.g., "06:00")
-            const endTime = timeRange.endDate.format('HH:mm'); // Extract end time (e.g., "23:59")
-
-            if (machineName && date) {
-                try {
-                    const response = await fetch('fetchMachineData.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            machineName: machineName,
-                            date: date,
-                            startTime: startTime,
-                            endTime: endTime
-                        })
-                    });
-
-                    if (!response.ok) throw new Error('Error fetching data');
-
-                    const data = await response.json();
-
-                    // Calculate usage percentage and update the specific h3 in the number div inside the correct sales div
-                    const usagePercentage = data.usagePercentage.toFixed(2); // Get the percentage from the response
-
-                    // Update only the specific h3 tag inside the correct sales div
-                    document.querySelector('.sales:nth-of-type(3) .number h3').textContent = `${usagePercentage}%`; // Targets the 3rd .sales div
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Failed to fetch or process the data.');
-                }
-            } else {
-                alert('Please select a machine, date, and time range.');
-            }
-        });
-    </script>
-
-    <script>
-        $(function() {
-            $('input[name="datetimes"]').daterangepicker({
-                timePicker: true,
-                timePicker24Hour: true,
-                timePickerIncrement: 1, // Allows manual minute input
-                locale: {
-                    format: 'hh:mm A',
-                    separator: ' to ', // Separator between start and end time
-                },
-                autoApply: true,
-                showDropdowns: true,
-                opens: 'center',
-                startDate: moment().startOf('day').hours(6),
-                endDate: moment().endOf('day').hours(23).minutes(59),
-            }).on('show.daterangepicker', function(ev, picker) {
-                picker.container.find('.calendar-table').hide(); // Hide the calendar
-            });
-
-            // Enable manual input for the time picker
-            $('input[name="datetimes"]').on('focus', function() {
-                $(this).prop('readonly', false); // Make input editable
-            });
-        });
-    </script>
-
-    <script>
-        document.getElementById('fetch-all-data').addEventListener('click', function(event) {
-            event.preventDefault();
-
-            const dateInput = document.getElementById('date-input');
-            const date = dateInput.value;
-
-            if (date) {
-                // Redirect to allData.php with the date as a query parameter
-                window.location.href = `allData.php?date=${encodeURIComponent(date)}`;
-            } else {
-                alert('Please select a date.');
-            }
-        });
-    </script>
 </body>
 
 </html>
