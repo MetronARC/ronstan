@@ -349,7 +349,7 @@
 
             for (let i = 0; i < 24 * 60; i++) {
                 const time = moment().startOf('day').minutes(i).format('HH:mm');
-                let color = '#ebd234';
+                let color = '#FFEA00';
                 let hoverLabel = '';
 
                 data.forEach(interval => {
@@ -359,7 +359,7 @@
 
                         if (arcOnTime !== null && arcOffTime !== null) { // Check if conversion was successful
                             if (i >= arcOnTime && i < arcOffTime) {
-                                color = '#008000';
+                                color = '#228B22';
                                 if (i === arcOnTime) {
                                     hoverLabel = `ArcOn: ${interval.ArcOn}, ArcOff: ${interval.ArcOff}, ArcTotal: ${arcOffTime - arcOnTime} minutes`;
                                 }
