@@ -346,6 +346,7 @@
             const backgroundColors = [];
             const borderColors = [];
             const hoverLabels = [];
+            const boxColors = [];
 
             for (let i = 0; i < 24 * 60; i++) {
                 const time = moment().startOf('day').minutes(i).format('HH:mm');
