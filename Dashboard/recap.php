@@ -350,6 +350,7 @@
             for (let i = 0; i < 24 * 60; i++) {
                 const time = moment().startOf('day').minutes(i).format('HH:mm');
                 let color = '#FFEA00';
+                let boxcolor = '#228B22';
                 let hoverLabel = '';
 
                 data.forEach(interval => {
@@ -378,6 +379,7 @@
                 backgroundColors.push(color);
                 borderColors.push(color);
                 hoverLabels.push(hoverLabel);
+                boxColors.push(boxcolor);
             }
 
             const chartContainer = document.getElementById('chart-container');
@@ -406,7 +408,7 @@
                     datasets: [{
                         label: 'Machine On/Off',
                         data: dataPoints,
-                        backgroundColor: backgroundColors,
+                        backgroundColor: boxColors,
                         borderColor: borderColors,
                         borderWidth: 1
                     }]
