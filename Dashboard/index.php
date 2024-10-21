@@ -173,7 +173,7 @@ $konek->close();
 
 
         <main>
-            <h1>Dashboard</h1>
+            <h1>Main Dashboard</h1>
 
             <div class="date"></div>
 
