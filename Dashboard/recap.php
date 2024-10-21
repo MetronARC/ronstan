@@ -133,7 +133,7 @@
         }
     </style>
 
-    <div class="container"  data-aos="zoom-out">
+    <div class="container" data-aos="zoom-out">
         <!-- SIDEBAR -->
         <aside>
             <div class="top">
@@ -282,6 +282,7 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="js/index.js"></script>
     <script>
@@ -315,7 +316,11 @@
                 renderChart(data, date);
 
             } else {
-                alert('Please select a machine and date.');
+                Swal.fire({
+                    title: "Good job!",
+                    text: "You clicked the button!",
+                    icon: "success"
+                });
             }
         });
 
@@ -547,7 +552,11 @@
                     alert('Failed to fetch or process the data.');
                 }
             } else {
-                alert('Please select a machine, date, and time range.');
+                Swal.fire({
+                    title: "Error!",
+                    text: "Please select machine and date",
+                    icon: "error"
+                });
             }
         });
     </script>
@@ -589,7 +598,11 @@
                 // Redirect to allData.php with the date as a query parameter
                 window.location.href = `allData.php?date=${encodeURIComponent(date)}`;
             } else {
-                alert('Please select a date.');
+                Swal.fire({
+                    title: "Error!",
+                    text: "Please select the date",
+                    icon: "error"
+                });
             }
         });
     </script>
