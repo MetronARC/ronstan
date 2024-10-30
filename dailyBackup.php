@@ -4,6 +4,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Set timezone to Asia/Jakarta
+date_default_timezone_set('Asia/Jakarta');
+
 // Database connection details
 $host = "localhost";
 $database = "u558841402_ronstandb";
@@ -35,7 +38,7 @@ if ($mysqli->connect_error) {
 
 // Write a header in the backup file
 fwrite($file_handle, "-- Database Backup for $database\n");
-fwrite($file_handle, "-- Generated on " . date("Y-m-d H:i:s") . "\n\n");
+fwrite($file_handle, "-- Generated on " . date("Y-m-d H:i:s") . " (Asia/Jakarta timezone)\n\n");
 fwrite($file_handle, "SET FOREIGN_KEY_CHECKS=0;\n\n");
 
 // Fetch all tables in the database
