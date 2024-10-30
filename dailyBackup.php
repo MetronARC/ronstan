@@ -26,15 +26,15 @@ if (!is_writable($backup_directory)) {
 $mysqldump_path = "/usr/bin/mysqldump";
 
 // Construct the command to back up the database
-$command = "$mysqldump_path --user=$user --password=$password $database > $backup_file 2>&1";
+$command = "$mysqldump_path --user=$user --password=$password $database > $backup_file";
 
-// Execute the command and capture the output
-$output = shell_exec($command);
+// Execute the command using exec()
+exec($command, $output, $return_var);
 
-// Check if the backup was created successfully
-if (file_exists($backup_file) && filesize($backup_file) > 0) {
+// Check if the command was successful
+if ($return_var === 0 && file_exists($backup_file) && filesize($backup_file) > 0) {
     echo "Backup created successfully: $backup_file";
 } else {
-    echo "Error creating backup. Command output: " . $output;
+    echo "Error creating backup. Command output: " . implode("\n", $output);
 }
 ?>
