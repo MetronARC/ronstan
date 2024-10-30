@@ -11,7 +11,7 @@ $user = "u558841402_ronstan";
 $password = "2468g0a7A7B7*";
 
 // Absolute path to the backup directory
-$backup_directory = "/home/u558841402/public_html/backup/";
+$backup_directory = "/home/u558841402/public_html/ronstan/backup/";
 $backup_file = $backup_directory . $database . "_" . date("Y-m-d_H-i-s") . ".sql";
 
 // Check if the backup directory exists and is writable
