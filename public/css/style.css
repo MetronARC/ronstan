@@ -467,6 +467,11 @@ main .recent-orders a {
     display: none;
   }
 
+  aside .logo img {
+    width: 8rem;
+    height: 4rem;
+  }  
+
   aside .sidebar h3 {
     display: none;
   }
