@@ -7,6 +7,13 @@ use CodeIgniter\Database\Exceptions\DataException;
 
 class APIController extends BaseController
 {
+    private $apiKey;  
+  
+       public function __construct()  
+       {  
+           // Load the API key from the .env file  
+           $this->apiKey = getenv('api.API_KEY');  
+       } 
     // checkTime.php
     public function updateLastSeen()
     {
@@ -17,7 +24,7 @@ class APIController extends BaseController
         $WeldID = $this->request->getGet('weldID');
 
         // Validate the API key
-        if ($apiKey !== "19403054") {
+        if ($apiKey !== $this->apiKey) {
             return $this->response->setStatusCode(403)->setBody("API key invalid.");
         }
 
@@ -78,7 +85,7 @@ class APIController extends BaseController
         $apiKey = $this->request->getGet('apiKey');
 
         // Validate the API key
-        if ($apiKey !== "19403054") {
+        if ($apiKey !== $this->apiKey) {
             return $this->response->setStatusCode(403)->setBody("API key invalid.");
         }
 
@@ -132,7 +139,7 @@ class APIController extends BaseController
         $apiKey = $this->request->getGet('apiKey');
 
         // Validate the API key
-        if ($apiKey !== "19403054") {
+        if ($apiKey !== $this->apiKey) {
             return $this->response->setStatusCode(403)->setBody("API key invalid.");
         }
 
@@ -191,7 +198,7 @@ class APIController extends BaseController
             $apiKey = $this->request->getGet('apiKey');
 
             // Validate the API key
-            if ($apiKey !== "19403054") {
+            if ($apiKey !== $this->apiKey) {
                 return $this->response->setStatusCode(403)->setBody("API key invalid.");
             }
 
@@ -349,10 +356,10 @@ class APIController extends BaseController
         $WeldID = $this->request->getGet('weldID');
         $CurrentDC = $this->request->getGet('currentDC');
         $VoltageDC = $this->request->getGet('voltageAverage');
+        $apiKey = $this->request->getGet('apiKey');
 
-        // Return if required fields are missing
-        if (empty($Area) || empty($UID) || empty($MachineID) || empty($WeldID)) {
-            return $this->response->setStatusCode(400)->setBody('Missing required parameters.');
+        if ($apiKey !== $this->apiKey) {
+            return $this->response->setStatusCode(400)->setBody("API key invalid.");
         }
 
         // Set timezone and get current time
@@ -427,18 +434,6 @@ class APIController extends BaseController
                         'State' => 'ON',
                         'lastBeat' => $DateTime // Update lastBeat with current DATETIME
                     ]);
-
-                    foreach ($queryUpdateArcOff->getResultArray() as $row) {
-                        $previousId = $row['id'];
-                        $ArcCheck = $row['ArcCheck'];
-
-                        // Update ArcOff and ArcTotal for previous rows
-                        $dataUpdateArcTotal = [
-                            'ArcOff' => $ArcCheck,
-                            'ArcTotal' => "TIMEDIFF('$ArcCheck', ArcOn)"
-                        ];
-                        $builder->where('id', $previousId)->update($dataUpdateArcTotal);
-                    }
                     return $this->response->setBody('Data successfully updated or inserted');
                 } else {
                     return $this->response->setStatusCode(500)->setBody('Error inserting ArcOn data: ' . $db->error());
