@@ -95,6 +95,10 @@
             right: 110px;
             /* Adjust to position it correctly */
         }
+
+        body{
+            overflow-y: hidden;
+        }
     </style>
 </head>
 
