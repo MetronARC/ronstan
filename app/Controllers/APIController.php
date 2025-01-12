@@ -55,7 +55,7 @@ class APIController extends BaseController
             // Update the lastBeat column in the heartBeatTable where WeldID matches
             $heartbeatBuilder = $db->table('heartbeattable');
             $heartbeatBuilder->where('WeldID', $WeldID)
-                ->update(['lastBeat' => $currentDateTime]);
+                ->update(['lastSeen' => $currentDateTime]);
 
             // Commit the transaction if both updates are successful
             if ($db->transComplete()) {
