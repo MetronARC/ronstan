@@ -14,7 +14,7 @@
                 <h3>Active Machine</h3>
                 <h1 id="activeMachineCount"><?= esc($activeMachineCount) ?></h1>
             </div>
-            <a href="monitoring.php">
+            <a href="<?= base_url('monitoring'); ?>">
                 <div class="progress">
                     <svg>
                         <circle cx="42" cy="42" r="36"></circle>
