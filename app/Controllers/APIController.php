@@ -7,74 +7,71 @@ use CodeIgniter\Database\Exceptions\DataException;
 
 class APIController extends BaseController
 {
-    private $apiKey;  
-  
-       public function __construct()  
-       {  
-           // Load the API key from the .env file  
-           $this->apiKey = getenv('api.API_KEY');  
-       } 
+    private $apiKey;
+
+    public function __construct()
+    {
+        // Load the API key from the .env file  
+        $this->apiKey = getenv('api.API_KEY');
+    }
     // checkTime.php
     public function updateLastSeen()
     {
-        // Retrieve the GET parameters
+        // Retrieve the GET parameters  
         $apiKey = $this->request->getGet('apiKey');
         $state = $this->request->getGet('State');
         $machineID = $this->request->getGet('MachineID');
         $WeldID = $this->request->getGet('weldID');
 
-        // Validate the API key
+        // Validate the API key  
         if ($apiKey !== $this->apiKey) {
             return $this->response->setStatusCode(403)->setBody("API key invalid.");
         }
 
-        // Validate state
+        // Validate state  
         if ($state !== "heartBeat") {
             return $this->response->setStatusCode(400)->setBody("State invalid");
         }
 
-        // Validate the MachineID
+        // Validate the MachineID  
         if (!$machineID) {
             return $this->response->setStatusCode(400)->setBody("Invalid MachineID");
         }
 
-        // Validate the WeldID
+        // Validate the WeldID  
         if (!$WeldID) {
             return $this->response->setStatusCode(400)->setBody("Invalid WeldID");
         }
 
-        // Load the database service
+        // Load the database service  
         $db = \Config\Database::connect();
 
-        // Set timezone and current time
+        // Set timezone and current time  
         date_default_timezone_set('Asia/Jakarta');
         $currentDateTime = date("Y-m-d H:i:s");
 
-        // Begin transaction to ensure both updates happen atomically
+        // Begin transaction to ensure the update happens atomically  
         $db->transStart();
 
-        // Update the lastSeen column in the machine table
+        // Update the lastSeen column in the machine table  
         $machineBuilder = $db->table('machine');
         try {
-            $machineBuilder->where('MachineID', $machineID) 
+            $machineBuilder->where('MachineID', $machineID)
                 ->update(['lastSeen' => $currentDateTime]);
 
-            // Update the lastBeat column in the heartBeatTable where WeldID matches
-            $heartbeatBuilder = $db->table('heartbeattable');
-            $heartbeatBuilder->where('WeldID', $WeldID) 
-                ->update(['lastBeat' => $currentDateTime]);
-            // Commit the transaction if both updates are successful
+            // Commit the transaction if the update is successful  
             if ($db->transComplete()) {
-                return $this->response->setStatusCode(200)->setBody("lastSeen and lastBeat updated successfully.");
+                return $this->response->setStatusCode(200)->setBody("lastSeen updated successfully.");
             } else {
                 return $this->response->setStatusCode(400)->setBody("Error: Update failed or no changes made.");
             }
         } catch (\Exception $e) {
-            // Rollback transaction in case of any errors
+            // Rollback transaction in case of any errors  
             $db->transRollback();
             return $this->response->setStatusCode(500)->setBody("Error updating records: " . $e->getMessage());
         }
     }
+
 
     // checkWeldID.php
     public function updateWeldID()
