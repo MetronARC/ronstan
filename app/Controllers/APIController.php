@@ -25,22 +25,22 @@ class APIController extends BaseController
 
         // Validate the API key  
         if ($apiKey !== $this->apiKey) {
-            return $this->response->setStatusCode(403)->setBody("API key invalid.");
+            return $this->response->setStatusCode(403)->setBody(json_encode(["error" => "API key invalid."]));
         }
 
         // Validate state  
         if ($state !== "heartBeat") {
-            return $this->response->setStatusCode(400)->setBody("State invalid");
+            return $this->response->setStatusCode(400)->setBody(json_encode(["error" => "State invalid"]));
         }
 
         // Validate the MachineID  
         if (!$machineID) {
-            return $this->response->setStatusCode(400)->setBody("Invalid MachineID");
+            return $this->response->setStatusCode(400)->setBody(json_encode(["error" => "Invalid MachineID"]));
         }
 
         // Validate the WeldID  
         if (!$WeldID) {
-            return $this->response->setStatusCode(400)->setBody("Invalid WeldID");
+            return $this->response->setStatusCode(400)->setBody(json_encode(["error" => "Invalid WeldID"]));
         }
 
         // Load the database service  
@@ -50,7 +50,7 @@ class APIController extends BaseController
         date_default_timezone_set('Asia/Jakarta');
         $currentDateTime = date("Y-m-d H:i:s");
 
-        // Begin transaction to ensure the update happens atomically  
+        // Begin transaction  
         $db->transStart();
 
         // Update the lastSeen column in the machine table  
@@ -59,25 +59,28 @@ class APIController extends BaseController
             $machineBuilder->where('MachineID', $machineID)
                 ->update(['lastSeen' => $currentDateTime]);
 
-            // Log the last executed query  
-            log_message('info', 'Last executed query: ' . $db->getLastQuery());
-
-
             // Commit the transaction if the update is successful  
             if ($db->transComplete()) {
-                return $this->response->setStatusCode(200)->setBody("lastSeen updated successfully.");
+                return $this->response->setStatusCode(200)->setBody(json_encode(["message" => "lastSeen updated successfully."]));
             } else {
-                $error = $db->error(); // Get the error message  
-                log_message('error', 'Database update error: ' . json_encode($error));
-                return $this->response->setStatusCode(400)->setBody("Error: Update failed or no changes made.");
+                // Get the last error and query  
+                $error = $db->error();
+                $lastQuery = $db->getLastQuery();
+                return $this->response->setStatusCode(400)->setBody(json_encode([
+                    "error" => "Update failed or no changes made.",
+                    "mysql_error" => $error,
+                    "last_query" => (string)$lastQuery
+                ]));
             }
         } catch (\Exception $e) {
             // Rollback transaction in case of any errors  
             $db->transRollback();
-            return $this->response->setStatusCode(500)->setBody("Error updating records: " . $e->getMessage());
+            return $this->response->setStatusCode(500)->setBody(json_encode([
+                "error" => "Error updating records: " . $e->getMessage(),
+                "last_query" => (string)$db->getLastQuery()
+            ]));
         }
     }
-
 
     // checkWeldID.php
     public function updateWeldID()
