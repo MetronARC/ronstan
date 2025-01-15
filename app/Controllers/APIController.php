@@ -59,6 +59,10 @@ class APIController extends BaseController
             $machineBuilder->where('MachineID', $machineID)
                 ->update(['lastSeen' => $currentDateTime]);
 
+            // Log the last executed query  
+            log_message('info', 'Last executed query: ' . $db->getLastQuery());
+
+
             // Commit the transaction if the update is successful  
             if ($db->transComplete()) {
                 return $this->response->setStatusCode(200)->setBody("lastSeen updated successfully.");
