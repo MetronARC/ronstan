@@ -56,14 +56,13 @@ class APIController extends BaseController
         // Update the lastSeen column in the machine table
         $machineBuilder = $db->table('machine');
         try {
-            $machineBuilder->where('MachineID', $machineID)
+            $machineBuilder->where('MachineID', $machineID) 
                 ->update(['lastSeen' => $currentDateTime]);
 
             // Update the lastBeat column in the heartBeatTable where WeldID matches
             $heartbeatBuilder = $db->table('heartbeattable');
-            $heartbeatBuilder->where('WeldID', $WeldID)
-                ->update(['lastSeen' => $currentDateTime]);
-
+            $heartbeatBuilder->where('WeldID', $WeldID) 
+                ->update(['lastBeat' => $currentDateTime]);
             // Commit the transaction if both updates are successful
             if ($db->transComplete()) {
                 return $this->response->setStatusCode(200)->setBody("lastSeen and lastBeat updated successfully.");
