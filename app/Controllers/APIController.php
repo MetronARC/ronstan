@@ -63,6 +63,8 @@ class APIController extends BaseController
             if ($db->transComplete()) {
                 return $this->response->setStatusCode(200)->setBody("lastSeen updated successfully.");
             } else {
+                $error = $db->error(); // Get the error message  
+                log_message('error', 'Database update error: ' . json_encode($error));
                 return $this->response->setStatusCode(400)->setBody("Error: Update failed or no changes made.");
             }
         } catch (\Exception $e) {
