@@ -1,4 +1,4 @@
-<?= $this->extend('template2/index') ?>
+<?= $this->extend('template3/index') ?>
 <?= $this->section('page-content') ?>
 
 <h1>All Machine Charts for <?= htmlspecialchars($date) ?></h1>
