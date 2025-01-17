@@ -102,7 +102,7 @@
 <body>
     <div class="container">
         <!-- SIDEBAR -->
-        <?= $this->include('template2/sidebar') ?>
+        <?= $this->include('template3/sidebar') ?>
         <!-- END OF SIDEBAR -->
 
 
@@ -112,7 +112,7 @@
 
         </main>
 
-        <?= $this->include('template2/right') ?>
+        <?= $this->include('template3/right') ?>
     </div>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="<?= base_url(); ?>js/index.js"></script>
