@@ -9,8 +9,8 @@ date_default_timezone_set('Asia/Jakarta');
 
 // Database connection details
 $host = "localhost";
-$database = "u558841402_ronstandb";
-$user = "u558841402_ronstan";
+$database = "u558841402_ronstanDB";
+$user = "u558841402_metronarc";
 $password = "2468g0a7A7B7*";
 
 // Absolute path to the backup directory
