@@ -104,14 +104,7 @@
         <?= $this->include('template/sidebar') ?>
         <!-- END OF SIDEBAR -->
 
-
-        <main>
-
-            <?= $this->renderSection('page-content') ?>
-
-        </main>
-
-        <?= $this->include('template/right') ?>
+        <?= $this->renderSection('page-content') ?>
     </div>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="<?= base_url(); ?>js/index.js"></script>
