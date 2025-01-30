@@ -640,8 +640,8 @@ main .recent-orders a {
 .datetime-input {
     border: 1px solid #ccc;
     padding: 7px;
-    font-size: 16px;
-    width: 90%;
+    font-size: 18px;
+    width: 100%;
     box-sizing: border-box;
     background: var(--color-white);
     color: var(--color-dark);

@@ -107,11 +107,50 @@ class Recap extends BaseController
     {
         $date = $this->request->getGet('date'); // Get the date from the query parameter
 
+        // Set timezone to Asia/Jakarta
+        $timezone = new \DateTimeZone('Asia/Jakarta');
+        $currentDateTime = new \DateTime($date, $timezone);
+        $dateString = $currentDateTime->format('Y-m-d'); // Format to match your database date format
+
+        // Initialize total arc time in seconds
+        $totalArcTimeInSeconds = 0;
+
+        // Query to get all tables that start with 'machinehistory'
+        $historyTablesQuery = $this->db->query("SHOW TABLES LIKE 'machinehistory%'");
+        $historyTables = $historyTablesQuery->getResultArray();
+
+        // Loop through the machinehistory tables and sum ArcTotal for today
+        foreach ($historyTables as $table) {
+            $tableName = current($table); // Get the table name from result
+
+            // Fetch all rows with today's date and sum ArcTotal
+            $arcTotalQuery = $this->db->query("
+                SELECT TIME_TO_SEC(ArcTotal) as ArcTotalSeconds 
+                FROM $tableName 
+                WHERE DATE(Date) = ?", [$dateString]);
+
+            $arcTotals = $arcTotalQuery->getResultArray();
+
+            // Sum up the ArcTotal in seconds
+            foreach ($arcTotals as $arcRow) {
+                $totalArcTimeInSeconds += $arcRow['ArcTotalSeconds'];
+            }
+        }
+
+        // Convert total seconds to H:i:s format
+        $totalArcHours = floor($totalArcTimeInSeconds / 3600);
+        $totalArcMinutes = floor(($totalArcTimeInSeconds % 3600) / 60);
+        $totalArcSeconds = $totalArcTimeInSeconds % 60;
+
+        // Format the time as H:i:s, even if hours exceed 24
+        $formattedArcTime = sprintf('%02d:%02d:%02d', $totalArcHours, $totalArcMinutes, $totalArcSeconds);
+
         // Pass the date to the view
         $data = [
             'title' => 'All Machine Charts',
             'sidebarData' => 'All Machine Chart',
-            'date' => $date // Pass the date to the view
+            'date' => $date, // Pass the date to the view
+            'arcTime' => $formattedArcTime
         ];
 
         return view('user/allChart', $data);
