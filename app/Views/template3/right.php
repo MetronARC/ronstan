@@ -18,7 +18,7 @@
         </div>
     </div>
     <div class="recent-updates">
-        <h2 style="margin-bottom: 0.5em">Recent Pings</h2>
+        <h2 style="margin-bottom: 0.5em"></h2>
         <div class="updates">
             <div class="update">
                 <div class="profile-photo">
