@@ -34,7 +34,7 @@
             display: inline-block;
             padding: 10px 20px;
             color: white;
-            background-color: #007bff;
+            background-color: var(--color-primary);
             text-decoration: none;
             border-radius: 5px;
             cursor: pointer;
@@ -66,7 +66,7 @@
             z-index: 10;
             /* Ensure it appears above other elements */
             padding: 5px 10px;
-            background-color: #007bff;
+            background-color: #7380ec;
             color: white;
             border: none;
             border-radius: 5px;

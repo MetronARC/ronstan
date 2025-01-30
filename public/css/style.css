@@ -626,6 +626,7 @@ main .recent-orders a {
 .date-input {
   border: 1px solid var(--color-dark);
   padding: 10px;
+  border-radius: 20px;
   /* Increased padding for more height */
   font-size: 16px;
   width: 100%;
@@ -633,16 +634,18 @@ main .recent-orders a {
   /* Ensures padding is included in width */
   background: var(--color-white);
   color: var(--color-dark);
+  margin-top: 0.5rem;
 }
 
 .datetime-input {
     border: 1px solid #ccc;
     padding: 7px;
     font-size: 16px;
-    width: 100%;
+    width: 90%;
     box-sizing: border-box;
     background: var(--color-white);
     color: var(--color-dark);
+    border-radius: 20px;
 }
 
 .date-input::-webkit-calendar-picker-indicator {

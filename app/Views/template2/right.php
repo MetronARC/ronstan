@@ -20,8 +20,8 @@
     <div class="recent-updates">
         <h2><br /></h2>
         <a id="fetch-all-data" href="#" onclick="generateAllCharts()">
-            <div class="updates" id="welder-updates" style="background: blue;">
-                <h2 style="color: white; font-size: 1.2rem">Generate All Machine Charts</h2>
+            <div class="updates" id="welder-updates" style="background: #7380ec;">
+                <h2 style="color: white; font-size: 1.2rem;">Generate All Machine Charts</h2>
             </div>
         </a>
 
@@ -32,7 +32,11 @@
                     // Redirect to the allChart view with the selected date
                     window.location.href = '<?= base_url('recap/allCharts') ?>?date=' + encodeURIComponent(dateInput);
                 } else {
-                    alert('Please select a date.');
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Please Select a Date',
+                        icon: 'error'
+                    });
                 }
             }
         </script>
