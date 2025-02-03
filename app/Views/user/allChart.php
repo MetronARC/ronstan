@@ -134,22 +134,22 @@
                     },
                     zoom: {
                         pan: {
-                            enabled: true,
+                            enabled: false, // Disable panning
                             mode: 'x',
                             modifierKey: 'ctrl',
                         },
                         zoom: {
-                            enabled: true,
+                            enabled: false, // Disable zooming
                             mode: 'x',
                             drag: {
-                                enabled: true,
+                                enabled: false, // Disable drag zooming
                                 backgroundColor: 'rgba(225,225,225,0.3)',
                             },
                             wheel: {
-                                enabled: true,
+                                enabled: false, // Disable wheel zooming
                             },
                             pinch: {
-                                enabled: true,
+                                enabled: false, // Disable pinch zooming
                             }
                         }
                     }
