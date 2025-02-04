@@ -71,6 +71,14 @@ class Monitoring extends BaseController
         $query = $db->query("SELECT MachineID, lastBeat, State FROM `$areaName`");
         $results = $query->getResultArray();
 
+        // Format the lastBeat field for each result
+        foreach ($results as &$result) {
+            if (!empty($result['lastBeat'])) {
+                $dateTime = new \DateTime($result['lastBeat']);
+                $result['lastBeat'] = $dateTime->format('d-m-Y H:i:s');
+            }
+        }
+
         // Return JSON response without specifying the return type as string
         return $this->response->setJSON($results);
     }
