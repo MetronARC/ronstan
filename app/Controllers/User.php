@@ -46,15 +46,53 @@ class User extends BaseController
 
             // Fetch all rows with today's date and sum ArcTotal
             $arcTotalQuery = $this->db->query("
-                SELECT TIME_TO_SEC(ArcTotal) as ArcTotalSeconds 
-                FROM $tableName 
-                WHERE DATE(Date) = ?", [$dateString]);
-            
+            SELECT TIME_TO_SEC(ArcTotal) as ArcTotalSeconds 
+            FROM $tableName 
+            WHERE DATE(Date) = ?", [$dateString]);
+
             $arcTotals = $arcTotalQuery->getResultArray();
-            
+
             // Sum up the ArcTotal in seconds
             foreach ($arcTotals as $arcRow) {
                 $totalArcTimeInSeconds += $arcRow['ArcTotalSeconds'];
+            }
+
+            // New query to get rows where ArcTotal > '11:00:00'
+            $arcTimeQuery = $this->db->query("
+            SELECT ArcOn, ArcOff, ArcTotal 
+            FROM $tableName 
+            WHERE ArcTotal > '11:00:00'");
+
+            $arcTimes = $arcTimeQuery->getResultArray();
+
+            // Loop through the rows and calculate the time difference
+            // Loop through the rows and calculate the time difference
+            foreach ($arcTimes as $arcTime) {
+                $arcOn = new \DateTime($arcTime['ArcOn']);
+                $arcOff = new \DateTime($arcTime['ArcOff']);
+
+                // If ArcOff is earlier than ArcOn (crossing midnight), add 24 hours to ArcOff
+                if ($arcOff < $arcOn) {
+                    $arcOff->modify('+1 day');
+                }
+
+                // Calculate the time difference in seconds
+                $timeDifference = $arcOff->getTimestamp() - $arcOn->getTimestamp();
+
+                // Convert the time difference back to H:i:s format
+                $hours = floor($timeDifference / 3600);
+                $minutes = floor(($timeDifference % 3600) / 60);
+                $seconds = $timeDifference % 60;
+                $newArcTotal = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+
+                // Update the ArcTotal column with the new value
+                $this->db->query(
+                    "
+        UPDATE $tableName 
+        SET ArcTotal = ? 
+        WHERE ArcOn = ? AND ArcOff = ?",
+                    [$newArcTotal, $arcTime['ArcOn'], $arcTime['ArcOff']]
+                );
             }
         }
 
@@ -73,13 +111,13 @@ class User extends BaseController
         foreach ($machines as $machine) {
             // Convert lastSeen to Asia/Jakarta timezone if it is not null
             $lastSeen = $machine['lastSeen'] ? new \DateTime($machine['lastSeen'], $timezone) : null;
-            
+
             if ($lastSeen) {
                 $interval = $currentDateTime->getTimestamp() - $lastSeen->getTimestamp();
-                
+
                 if ($interval > 120) {
                     $machineID = $machine['MachineID'];
-                    
+
                     // Update the State column to "OFF" in the area1 table where MachineID matches
                     $this->db->query("UPDATE area1 SET State = 'OFF' WHERE MachineID = ?", [$machineID]);
 
