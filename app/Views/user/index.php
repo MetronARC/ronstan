@@ -12,7 +12,7 @@
             <span class="material-symbols-outlined">zoom_in_map</span>
             <div class="middle">
                 <div class="left">
-                    <h3>Active Machine</h3>
+                    <h3>Active Machines</h3>
                     <h1 id="activeMachineCount"><?= esc($activeMachineCount) ?></h1>
                 </div>
                 <a href="<?= base_url('monitoring'); ?>">
