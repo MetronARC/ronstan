@@ -1,50 +1,35 @@
-FROM tomsik68/xampp
+# Use an official PHP image with Apache for arm64
+FROM php:8.2.27-apache-bookworm
 
-# Install necessary packages
+# Install Apache and required PHP extensions
 RUN apt-get update && apt-get install -y \
-  ca-certificates \
-  curl \
-  sudo \
-  php-cli \
-  unzip \
-  git \
-  php-zip \
-  php-curl \
-  php-intl \
-  php-xml \
-  php-mbstring \
-  php-dom
+    apache2 \
+    libonig-dev libzip-dev unzip curl \
+    libicu-dev nano && \
+    docker-php-ext-install pdo pdo_mysql mysqli zip && \
+    docker-php-ext-install intl
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Enable Apache mod_rewrite for CI4
+RUN a2enmod rewrite
 
-WORKDIR /opt/lampp/htdocs
+# Set working directory inside the container
+WORKDIR /var/www/html
 
-# Create the "sparcdashboard" folder
-RUN composer create-project codeigniter4/appstarter sparcdashboard
+# Copy the entire CodeIgniter project to the container
+COPY . /var/www/html
 
-# Copy your project files
-COPY . /opt/lampp/htdocs/sparcdashboard
+# Create writable directories if they don't exist
+RUN mkdir -p /var/www/html/public/writable/cache /var/www/html/public/writable/logs /var/www/html/public/writable/session
 
-# Set Apache DocumentRoot
-RUN sed -i 's|DocumentRoot "/opt/lampp/htdocs"|DocumentRoot "/opt/lampp/htdocs/sparcdashboard/public"|' /opt/lampp/etc/httpd.conf \
-  && sed -i 's|<Directory "/opt/lampp/htdocs">|<Directory "/opt/lampp/htdocs/sparcdashboard/public">|' /opt/lampp/etc/httpd.conf
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html/public/writable
 
-# Grant permissions
-RUN chmod -R 777 /opt/lampp/htdocs/sparcdashboard/writable/cache /opt/lampp/htdocs/sparcdashboard/writable/session
+# Change Apache's DocumentRoot to the public directory
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
-# Install MySQL client
-RUN apt-get update && apt-get install -y default-mysql-client
-
-# Copy the database dump
-COPY database/ci4login.sql /opt/lampp/htdocs
-
-# Start MySQL, create the database, wait for it to become available, and then import the database
-RUN /opt/lampp/lampp startmysql && \
-    sleep 10 && \
-    echo "CREATE DATABASE IF NOT EXISTS ci4login;" | mysql --protocol=tcp -u root && \
-    mysql --protocol=tcp -u root -D ci4login < /opt/lampp/htdocs/ci4login.sql
-
-# Expose port 80
+# Expose the Apache port
 EXPOSE 80
 
+# Start Apache server
+CMD ["apache2-foreground"]

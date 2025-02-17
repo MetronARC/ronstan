@@ -148,7 +148,7 @@ class Recap extends BaseController
         // Pass the date to the view
         $data = [
             'title' => 'All Machine Charts',
-            'sidebarData' => 'All Machine Chart',
+            'sidebarData' => 'recap',
             'date' => $date, // Pass the date to the view
             'arcTime' => $formattedArcTime
         ];
