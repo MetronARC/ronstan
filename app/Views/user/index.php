@@ -70,3 +70,9 @@
 </div>
 
 <?= $this->endSection() ?>
+
+<!-- Production	:	{ ON } 		        < Green >	    #28a745
+Maintenance	:	    { MAINTENANCE }     < Yellow >	    #ffc107
+Setup 		: 	    { SETUP }	        < Blue >	    #007bff
+Tooling 	: 	    { TOOLING }	        < Purple >	    #6f42c1
+Else 		:	    { IDLE }	        < Gray >	    #6c757d -->
