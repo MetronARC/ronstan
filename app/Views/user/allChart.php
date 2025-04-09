@@ -3,7 +3,12 @@
 
 <h1>All Machine Charts for <?= htmlspecialchars($date) ?></h1>
 <div class="recent-orders">
-<div id="charts-container" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; max-width: 1000px; margin: 0 auto;">
+    <!-- Add loading spinner -->
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading charts...</p>
+    </div>
+    <div id="charts-container" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; max-width: 1000px; margin: 0 auto;">
         <!-- Charts will be dynamically inserted here -->
     </div>
 </div>
@@ -28,6 +33,10 @@
     });
 
     function fetchChartData(date) {
+        // Show loading spinner
+        const loadingSpinner = document.querySelector('.loading-spinner');
+        loadingSpinner.style.display = 'block';
+
         fetch('<?= base_url('recap/fetchChartData') ?>', { // Fetch from the controller
                 method: 'POST',
                 headers: {
@@ -50,6 +59,7 @@
                 const chartsContainer = document.getElementById('charts-container');
                 chartsContainer.innerHTML = ''; // Clear previous charts
 
+                const renderPromises = [];
                 for (const machineName in responseData.data) {
                     const machineData = responseData.data[machineName];
                     const canvas = document.createElement('canvas');
@@ -58,14 +68,21 @@
                     canvas.style.height = '100px';
                     chartsContainer.appendChild(canvas);
                     console.log(`Canvas created for ${machineName}:`, canvas);
-                    renderChart(machineData, date, machineName, canvas);
+                    renderPromises.push(renderChart(machineData, date, machineName, canvas));
                 }
+
+                // Wait for all charts to render before hiding the loading spinner
+                Promise.all(renderPromises)
+                    .finally(() => {
+                        loadingSpinner.style.display = 'none';
+                    });
             })
             .catch(error => {
                 console.error('Error fetching chart data:', error);
+                // Hide loading spinner on error
+                loadingSpinner.style.display = 'none';
             });
     }
-
 
     function renderChart(data, date, machineName, canvas) {
         const dataPoints = [];
@@ -109,93 +126,96 @@
 
         const ctx = canvas.getContext('2d');
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                datasets: [{
-                    label: `Usage for ${machineName}`,
-                    data: dataPoints,
-                    backgroundColor: boxColors,
-                    borderColor: borderColors,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        enabled: true,
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                const label = tooltipItem.raw.label;
-                                return label ? label : '';
+        return new Promise((resolve) => {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    datasets: [{
+                        label: `Usage for ${machineName}`,
+                        data: dataPoints,
+                        backgroundColor: boxColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    const label = tooltipItem.raw.label;
+                                    return label ? label : '';
+                                }
                             }
-                        }
-                    },
-                    zoom: {
-                        pan: {
-                            enabled: false, // Disable panning
-                            mode: 'x',
-                            modifierKey: 'ctrl',
                         },
                         zoom: {
-                            enabled: false, // Disable zooming
-                            mode: 'x',
-                            drag: {
-                                enabled: false, // Disable drag zooming
-                                backgroundColor: 'rgba(225,225,225,0.3)',
+                            pan: {
+                                enabled: false, // Disable panning
+                                mode: 'x',
+                                modifierKey: 'ctrl',
                             },
-                            wheel: {
-                                enabled: false, // Disable wheel zooming
-                            },
-                            pinch: {
-                                enabled: false, // Disable pinch zooming
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'minute',
-                            displayFormats: {
-                                minute: 'HH:mm'
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Time'
-                        },
-                        ticks: {
-                            source: 'data',
-                            autoSkip: false,
-                            maxRotation: 0,
-                            minRotation: 0,
-                            major: {
-                                enabled: true
-                            },
-                            callback: function(value, index, values) {
-                                const time = moment(value).format('HH:mm');
-                                const specificTimes = ['00:01', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', '23:59'];
-                                return specificTimes.includes(time) ? time : '';
+                            zoom: {
+                                enabled: false, // Disable zooming
+                                mode: 'x',
+                                drag: {
+                                    enabled: false, // Disable drag zooming
+                                    backgroundColor: 'rgba(225,225,225,0.3)',
+                                },
+                                wheel: {
+                                    enabled: false, // Disable wheel zooming
+                                },
+                                pinch: {
+                                    enabled: false, // Disable pinch zooming
+                                }
                             }
                         }
                     },
-                    y: {
-                        beginAtZero: true,
-                        max: 1,
-                        ticks: {
-                            stepSize: 1,
-                            callback: value => value === 1 ? 'On' : 'Off'
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'minute',
+                                displayFormats: {
+                                    minute: 'HH:mm'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            },
+                            ticks: {
+                                source: 'data',
+                                autoSkip: false,
+                                maxRotation: 0,
+                                minRotation: 0,
+                                major: {
+                                    enabled: true
+                                },
+                                callback: function(value, index, values) {
+                                    const time = moment(value).format('HH:mm');
+                                    const specificTimes = ['00:01', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', '23:59'];
+                                    return specificTimes.includes(time) ? time : '';
+                                }
+                            }
                         },
-                        title: {
-                            display: true,
-                            text: 'Status'
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            ticks: {
+                                stepSize: 1,
+                                callback: value => value === 1 ? 'On' : 'Off'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Status'
+                            }
                         }
                     }
                 }
-            }
+            });
+            resolve();
         });
     }
 
