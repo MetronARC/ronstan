@@ -8,7 +8,7 @@
         <div class="spinner"></div>
         <p>Loading charts...</p>
     </div>
-    <div id="charts-container" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; max-width: 1000px; margin: 0 auto;">
+    <div id="charts-container" style="display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; margin: 0 auto; padding: 10px;">
         <!-- Charts will be dynamically inserted here -->
     </div>
 </div>
@@ -23,6 +23,64 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
 <!-- Sweet Alert Library -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    @media (max-width: 768px) {
+        #charts-container {
+            padding: 5px;
+        }
+        
+        .chart-wrapper {
+            width: 98% !important;
+            padding: 10px !important;
+            height: 300px !important;
+        }
+        
+        .chart-wrapper h3 {
+            font-size: 1rem !important;
+        }
+
+        .chart-container {
+            height: 200px !important;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .chart-wrapper {
+            width: 90% !important;
+            height: 350px;
+        }
+
+        .chart-container {
+            height: 250px;
+        }
+    }
+
+    .chart-wrapper {
+        width: 95%;
+        max-width: 1200px;
+        height: 500px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 20px;
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--box-shadow);
+    }
+
+    .chart-container {
+        width: 100%;
+        height: 400px;
+        position: relative;
+    }
+
+    .chart-canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -59,17 +117,44 @@
                 const chartsContainer = document.getElementById('charts-container');
                 chartsContainer.innerHTML = ''; // Clear previous charts
 
+                // Sort machine names alphabetically
+                const sortedMachineNames = Object.keys(responseData.data).sort();
+
                 const renderPromises = [];
-                for (const machineName in responseData.data) {
+                sortedMachineNames.forEach(machineName => {
                     const machineData = responseData.data[machineName];
+                    
+                    // Create a wrapper div for each chart
+                    const chartWrapper = document.createElement('div');
+                    chartWrapper.className = 'chart-wrapper';
+
+                    // Create and style the title
+                    const title = document.createElement('h3');
+                    title.textContent = `Machine ID: ${machineName}`;
+                    title.style.marginBottom = '15px';
+                    title.style.textAlign = 'center';
+                    title.style.width = '100%';
+                    title.style.color = 'var(--color-dark)';
+                    title.style.fontSize = '1.2rem';
+                    
+                    // Create a container for the chart
+                    const chartContainer = document.createElement('div');
+                    chartContainer.className = 'chart-container';
+                    
+                    // Create canvas for the chart
                     const canvas = document.createElement('canvas');
                     canvas.id = `chart-${machineName}`;
-                    canvas.style.width = '300px';
-                    canvas.style.height = '100px';
-                    chartsContainer.appendChild(canvas);
+                    canvas.className = 'chart-canvas';
+                    
+                    // Add elements to their containers
+                    chartContainer.appendChild(canvas);
+                    chartWrapper.appendChild(title);
+                    chartWrapper.appendChild(chartContainer);
+                    chartsContainer.appendChild(chartWrapper);
+                    
                     console.log(`Canvas created for ${machineName}:`, canvas);
                     renderPromises.push(renderChart(machineData, date, machineName, canvas));
-                }
+                });
 
                 // Wait for all charts to render before hiding the loading spinner
                 Promise.all(renderPromises)
@@ -140,6 +225,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         tooltip: {
                             enabled: true,
@@ -152,22 +238,22 @@
                         },
                         zoom: {
                             pan: {
-                                enabled: false, // Disable panning
+                                enabled: false,
                                 mode: 'x',
                                 modifierKey: 'ctrl',
                             },
                             zoom: {
-                                enabled: false, // Disable zooming
+                                enabled: false,
                                 mode: 'x',
                                 drag: {
-                                    enabled: false, // Disable drag zooming
+                                    enabled: false,
                                     backgroundColor: 'rgba(225,225,225,0.3)',
                                 },
                                 wheel: {
-                                    enabled: false, // Disable wheel zooming
+                                    enabled: false,
                                 },
                                 pinch: {
-                                    enabled: false, // Disable pinch zooming
+                                    enabled: false,
                                 }
                             }
                         }
