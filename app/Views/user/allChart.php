@@ -2,6 +2,19 @@
 <?= $this->section('page-content') ?>
 
 <h1>All Machine Charts for <?= htmlspecialchars($date) ?></h1>
+
+<!-- Add Legend -->
+<div class="chart-legend">
+    <div class="legend-item">
+        <span class="legend-color" style="background-color: #228B22;"></span>
+        <span class="legend-label">Production</span>
+    </div>
+    <div class="legend-item">
+        <span class="legend-color" style="background-color: #FFEA00;"></span>
+        <span class="legend-label">IDLE</span>
+    </div>
+</div>
+
 <div class="recent-orders">
     <!-- Add loading spinner -->
     <div class="loading-spinner">
@@ -25,7 +38,59 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+    /* Legend Styles */
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin: 20px auto;
+        padding: 15px;
+        background-color: var(--color-white);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--box-shadow);
+        max-width: 1200px;
+        width: 95%;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .legend-label {
+        font-size: 1rem;
+        color: var(--color-dark);
+    }
+
     @media (max-width: 768px) {
+        .chart-legend {
+            padding: 10px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+        }
+
+        .legend-label {
+            font-size: 0.9rem;
+        }
+
         #charts-container {
             padding: 5px;
         }
