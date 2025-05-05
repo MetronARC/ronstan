@@ -19,18 +19,22 @@
     </div>
     <div class="recent-updates">
         <h2><br /></h2>
-        <a id="fetch-all-data" href="#" onclick="generateAllCharts()">
-            <div class="updates" id="welder-updates" style="background: #7380ec;">
-                <h2 style="color: white; font-size: 1.2rem;">Generate All Machine Charts</h2>
-            </div>
-        </a>
+        <form id="generate-charts-form" method="POST" action="<?= base_url('recap/allCharts') ?>">
+            <input type="hidden" name="date" id="form-date-input">
+            <a id="fetch-all-data" href="#" onclick="submitGenerateCharts(event)">
+                <div class="updates" id="welder-updates" style="background: #7380ec;">
+                    <h2 style="color: white; font-size: 1.2rem;">Generate All Machine Charts</h2>
+                </div>
+            </a>
+        </form>
 
         <script>
-            function generateAllCharts() {
+            function submitGenerateCharts(event) {
+                event.preventDefault();
                 const dateInput = document.getElementById('date-input').value;
                 if (dateInput) {
-                    // Redirect to the allChart view with the selected date
-                    window.location.href = '<?= base_url('recap/allCharts') ?>?date=' + encodeURIComponent(dateInput);
+                    document.getElementById('form-date-input').value = dateInput;
+                    document.getElementById('generate-charts-form').submit();
                 } else {
                     Swal.fire({
                         title: 'Error!',

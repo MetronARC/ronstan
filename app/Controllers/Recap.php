@@ -105,7 +105,13 @@ class Recap extends BaseController
 
     public function allCharts()
     {
-        $date = $this->request->getGet('date'); // Get the date from the query parameter
+        $date = $this->request->getPost('date'); // Get the date from POST data instead of GET
+
+        // If no date is provided, redirect back with error
+        if (empty($date)) {
+            session()->setFlashdata('error', 'Please select a date');
+            return redirect()->back();
+        }
 
         // Set timezone to Asia/Jakarta
         $timezone = new \DateTimeZone('Asia/Jakarta');

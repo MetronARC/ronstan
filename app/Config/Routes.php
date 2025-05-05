@@ -10,6 +10,7 @@ $routes->get('/admin', 'Admin::index', ['filter' => 'role:admin']);
 $routes->get('/admin/index', 'Admin::index', ['filter' => 'role:admin']);
 $routes->get('/admin/(:num)', 'Admin::detail/$1', ['filter' => 'role:admin']);
 $routes->post('recap/fetchMachineData', 'Recap::fetchMachineData');
+$routes->post('recap/allCharts', 'Recap::allCharts');
 $routes->get('API/updateLastSeen', 'APIController::updateLastSeen');
 $routes->get('API/updateWeldID', 'APIController::updateWeldID');
 $routes->get('API/insertHeartBeat', 'APIController::insertHeartbeat');
