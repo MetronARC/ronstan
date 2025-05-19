@@ -58,7 +58,7 @@ class AdditionalAPI extends BaseController
 
             if ($Status == "maintenanceOn") {
                 // Update LED state for maintenance ON
-                $ledBuilder = $db->table('ledState');
+                $ledBuilder = $db->table('ledstate');
                 $ledBuilder->where('State', 'maintenance')->update(['ledStatus' => 1]);
 
                 // Insert into machine history for ArcOn
@@ -92,7 +92,7 @@ class AdditionalAPI extends BaseController
                 }
             } else if ($Status == "maintenanceOff") {
                 // Update LED state for maintenance OFF
-                $ledBuilder = $db->table('ledState');
+                $ledBuilder = $db->table('ledstate');
                 $ledBuilder->where('State', 'maintenance')->update(['ledStatus' => 0]);
 
                 // Fetch the ArcOn time to calculate ArcTotal
@@ -135,7 +135,7 @@ class AdditionalAPI extends BaseController
                 }
             } else if ($Status == "toolingOn") {
                 // Update LED state for tooling ON
-                $ledBuilder = $db->table('ledState');
+                $ledBuilder = $db->table('ledstate');
                 $ledBuilder->where('State', 'tooling')->update(['ledStatus' => 1]);
 
                 // Insert into machine history for Tooling
@@ -169,7 +169,7 @@ class AdditionalAPI extends BaseController
                 }
             } else if ($Status == "toolingOff") {
                 // Update LED state for tooling OFF
-                $ledBuilder = $db->table('ledState');
+                $ledBuilder = $db->table('ledstate');
                 $ledBuilder->where('State', 'tooling')->update(['ledStatus' => 0]);
 
                 // Fetch the ArcOn time to calculate ArcTotal
@@ -208,7 +208,7 @@ class AdditionalAPI extends BaseController
                 }
             } else if ($Status == "setupOn") {
                 // Update LED state for setup ON
-                $ledBuilder = $db->table('ledState');
+                $ledBuilder = $db->table('ledstate');
                 $ledBuilder->where('State', 'setup')->update(['ledStatus' => 1]);
 
                 // Insert into machine history for Setup
@@ -242,7 +242,7 @@ class AdditionalAPI extends BaseController
                 }
             } else if ($Status == "setupOff") {
                 // Update LED state for setup OFF
-                $ledBuilder = $db->table('ledState');
+                $ledBuilder = $db->table('ledstate');
                 $ledBuilder->where('State', 'setup')->update(['ledStatus' => 0]);
 
                 // Fetch the ArcOn time to calculate ArcTotal
@@ -327,7 +327,7 @@ class AdditionalAPI extends BaseController
         $db = \Config\Database::connect();
         
         // Query the ledState table
-        $query = $db->table('ledState')->get();
+        $query = $db->table('ledstate')->get();
         $results = $query->getResult();
         
         // Initialize the response array
