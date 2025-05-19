@@ -386,38 +386,49 @@ class APIController extends BaseController
             return $this->response->setBody('Card not in the database');
         }
 
-        // Function to check and insert if not exists
-        function checkAndInsert($db, $table, $WeldID, $MachineID, $Area, $UID, $Name, $Date, $Time)
-        {
-            $builder = $db->table($table);
-            $queryCheck = $builder->where('WeldID', $WeldID)->get();
-
-            if ($queryCheck->getNumRows() == 0) {
-                $data = [
-                    'MachineID' => $MachineID,
-                    'WeldID' => $WeldID,
-                    'Area' => $Area,
-                    'UID' => $UID,
-                    'Name' => $Name,
-                    'Date' => $Date,
-                    'Login' => $Time,
-                    'Status' => 'Active'
-                ];
-                $builder->insert($data);
-            }
-        }
-
         // Handle different areas
         if ($Area == "1" || $Area == "2") {
             $tableArea = $Area == "1" ? "area1" : "area2";
-            checkAndInsert($db, $tableArea, $WeldID, $MachineID, $Area, $UID, $Name, $Date, $Time);
-
             $tableHistory = $Area == "1" ? "machinehistory1" : "machinehistory2";
 
             if ($Status == "ArcOn") {
-                // Insert into machine history for ArcOn
+                // Set all ledstate ledStatus to false
+                $db->query("UPDATE ledstate SET ledStatus = 'false'");
+
+                // First check for any unfinished MAINTENANCE, TOOLING, or SETUP states
+                $builder = $db->table($tableHistory);
+                $unfinishedState = $builder->select('id, ArcOn')
+                    ->where('MachineID', $MachineID)
+                    ->where('Area', $Area)
+                    ->whereIn('State', ['MAINTENANCE', 'TOOLING', 'SETUP'])
+                    ->where('ArcOff', null)
+                    ->orderBy('id', 'DESC')
+                    ->limit(1)
+                    ->get()
+                    ->getRow();
+
+                if ($unfinishedState && isset($unfinishedState->id)) {
+                    // Calculate ArcTotal for the unfinished state
+                    $ArcTotal = date_diff(date_create($unfinishedState->ArcOn), date_create($Time))->format('%H:%I:%S');
+
+                    // Update the unfinished state with ArcOff time
+                    $builder->where('id', $unfinishedState->id)->update([
+                        'ArcOff' => $Time,
+                        'ArcTotal' => $ArcTotal
+                    ]);
+
+                    // Also update the area table to IDLE state
+                    $areaBuilder = $db->table($tableArea);
+                    $areaBuilder->where('MachineID', $MachineID)->update([
+                        'State' => 'IDLE',
+                        'lastBeat' => $DateTime
+                    ]);
+                }
+
+                // Then proceed with normal ArcOn operation
                 $builder = $db->table($tableHistory);
                 $dataArcOn = [
+                    'State' => 'ON',
                     'Area' => $Area,
                     'MachineID' => $MachineID,
                     'WeldID' => $WeldID,
@@ -426,18 +437,18 @@ class APIController extends BaseController
                     'Date' => $Date
                 ];
                 if ($builder->insert($dataArcOn)) {
-                    // Check for previous rows with NULL ArcOff and update them
-                    $queryUpdateArcOff = $builder->where('MachineID', $MachineID)
-                        ->where('Area', $Area)
-                        ->where('ArcOff', null)
-                        ->where('id <', "(SELECT MAX(id) FROM $tableHistory WHERE MachineID = '$MachineID' AND Area = '$Area')", false)
-                        ->get();
-
-                    // Update the 'State' to 'ON' and 'lastBeat' to current time in DATETIME format
+                    // Update the area table with State ON and other details
                     $areaBuilder = $db->table($tableArea);
                     $areaBuilder->where('MachineID', $MachineID)->update([
                         'State' => 'ON',
-                        'lastBeat' => $DateTime // Update lastBeat with current DATETIME
+                        'lastBeat' => $DateTime,
+                        'WeldID' => $WeldID,
+                        'Area' => $Area,
+                        'UID' => $UID,
+                        'Name' => $Name,
+                        'Date' => $Date,
+                        'Login' => $Time,
+                        'Status' => 'Active'
                     ]);
                     return $this->response->setBody('Data successfully updated or inserted');
                 } else {
@@ -446,7 +457,9 @@ class APIController extends BaseController
             } else if ($Status == "ArcOff") {
                 // Fetch the ArcOn time to calculate ArcTotal
                 $builder = $db->table($tableHistory);
-                $lastArcOnRecord = $builder->select('ArcOn')
+
+                // First get the latest record ID
+                $latestRecord = $builder->select('id, ArcOn')
                     ->where('MachineID', $MachineID)
                     ->where('Area', $Area)
                     ->orderBy('id', 'DESC')
@@ -454,24 +467,26 @@ class APIController extends BaseController
                     ->get()
                     ->getRow();
 
-                if ($lastArcOnRecord) {
-                    $ArcOn = $lastArcOnRecord->ArcOn;
+                if ($latestRecord) {
+                    $ArcOn = $latestRecord->ArcOn;
                     // Calculate the ArcTotal as the difference between ArcOff and ArcOn
                     $ArcTotal = date_diff(date_create($ArcOn), date_create($Time))->format('%H:%I:%S');
 
-                    // Update for ArcOff
+                    // Update for ArcOff using the specific ID
                     $dataArcOff = [
                         'ArcOff' => $Time,
                         'ArcTotal' => $ArcTotal,
                         'CurrentDC' => $CurrentDC,
                         'Voltage' => $VoltageDC
                     ];
-                    if ($builder->where('id', "(SELECT MAX(id) FROM $tableHistory WHERE MachineID = '$MachineID' AND Area = '$Area')", false)
-                        ->update($dataArcOff)
-                    ) {
+
+                    if ($builder->where('id', $latestRecord->id)->update($dataArcOff)) {
                         // Update the 'State' in area table to 'IDLE'
                         $areaBuilder = $db->table($tableArea);
-                        $areaBuilder->where('MachineID', $MachineID)->update(['State' => 'IDLE']);
+                        $areaBuilder->where('MachineID', $MachineID)->update([
+                            'State' => 'IDLE',
+                            'lastBeat' => $DateTime
+                        ]);
 
                         return $this->response->setBody('Data successfully updated for ArcOff');
                     } else {
@@ -481,8 +496,40 @@ class APIController extends BaseController
                     return $this->response->setBody('No ArcOn record found to calculate ArcTotal.');
                 }
             } else if ($Status == "ArcCheck") {
-                // Handle ArcCheck
+                // Set all ledstate ledStatus to false
+                $db->query("UPDATE ledstate SET ledStatus = 'false'");
+
+                // First check for any unfinished MAINTENANCE, TOOLING, or SETUP states
                 $builder = $db->table($tableHistory);
+                $unfinishedState = $builder->select('id, ArcOn')
+                    ->where('MachineID', $MachineID)
+                    ->where('Area', $Area)
+                    ->whereIn('State', ['MAINTENANCE', 'TOOLING', 'SETUP'])
+                    ->where('ArcOff', null)
+                    ->orderBy('id', 'DESC')
+                    ->limit(1)
+                    ->get()
+                    ->getRow();
+
+                if ($unfinishedState && isset($unfinishedState->id)) {
+                    // Calculate ArcTotal for the unfinished state
+                    $ArcTotal = date_diff(date_create($unfinishedState->ArcOn), date_create($Time))->format('%H:%I:%S');
+
+                    // Update the unfinished state with ArcOff time
+                    $builder->where('id', $unfinishedState->id)->update([
+                        'ArcOff' => $Time,
+                        'ArcTotal' => $ArcTotal
+                    ]);
+
+                    // Also update the area table to IDLE state
+                    $areaBuilder = $db->table($tableArea);
+                    $areaBuilder->where('MachineID', $MachineID)->update([
+                        'State' => 'IDLE',
+                        'lastBeat' => $DateTime
+                    ]);
+                }
+
+                // Handle ArcCheck
                 $querySelect = $builder->select('id, ArcTotal')
                     ->where('MachineID', $MachineID)
                     ->where('Area', $Area)

@@ -81,6 +81,8 @@ class Filters extends BaseFilters
                 'API/insertHeartBeat',
                 'API/handleArea',
                 'API/updateMachineData',
+                'API/updateAdditionalData',
+                'API/getLedStatus'
             ]],
         ],
         'after' => [

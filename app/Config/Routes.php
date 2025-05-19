@@ -18,4 +18,7 @@ $routes->get('API/handleArea', 'APIController::handleArea');
 $routes->get('API/updateMachineData', 'APIController::updateMachineData');
 $routes->post('recap/fetchChartData', 'Recap::fetchChartData');
 
+$routes->get('API/updateAdditionalData', 'AdditionalAPI::updateAdditionalData');
+$routes->get('API/getLedStatus', 'AdditionalAPI::getLedStatus');
+
 $routes->setAutoRoute(true);

@@ -13,6 +13,18 @@
         <span class="legend-color" style="background-color: #FFEA00;"></span>
         <span class="legend-label">IDLE</span>
     </div>
+    <div class="legend-item">
+        <span class="legend-color" style="background-color: #2196F3;"></span>
+        <span class="legend-label">MAINTENANCE</span>
+    </div>
+    <div class="legend-item">
+        <span class="legend-color" style="background-color: #FFFFFF; border: 1px solid #BDBDBD;"></span>
+        <span class="legend-label">TOOLING</span>
+    </div>
+    <div class="legend-item">
+        <span class="legend-color" style="background-color:#383838;"></span>
+        <span class="legend-label">Other</span>
+    </div>
 </div>
 
 <div class="recent-orders">
@@ -243,8 +255,8 @@
 
         for (let i = 0; i < 24 * 60; i++) {
             const time = moment().startOf('day').minutes(i).format('HH:mm');
-            let color = '#FFEA00';
-            let boxcolor = '#228B22';
+            let color = '#383838'; // Default grey
+            let boxcolor = '#383838';
             let hoverLabel = '';
 
             data.forEach(interval => {
@@ -254,9 +266,30 @@
 
                     if (arcOnTime !== null && arcOffTime !== null) {
                         if (i >= arcOnTime && i < arcOffTime) {
-                            color = '#228B22';
+                            // Determine color based on State
+                            switch ((interval.State || '').toUpperCase()) {
+                                case 'ON':
+                                    color = '#228B22'; // Green
+                                    boxcolor = '#228B22';
+                                    break;
+                                case 'MAINTENANCE':
+                                    color = '#2196F3'; // Blue
+                                    boxcolor = '#2196F3';
+                                    break;
+                                case 'SETUP':
+                                    color = '#FFEA00'; // Yellow
+                                    boxcolor = '#FFEA00';
+                                    break;
+                                case 'TOOLING':
+                                    color = '#FFFFFF'; // White
+                                    boxcolor = '#FFFFFF';
+                                    break;
+                                default:
+                                    color = '#383838'; // Grey
+                                    boxcolor = '#383838';
+                            }
                             if (i === arcOnTime) {
-                                hoverLabel = `ArcOn: ${interval.ArcOn}, ArcOff: ${interval.ArcOff}, ArcTotal: ${arcOffTime - arcOnTime} minutes`;
+                                hoverLabel = `ArcOn: ${interval.ArcOn}, ArcOff: ${interval.ArcOff}, State: ${interval.State || 'Unknown'}, ArcTotal: ${arcOffTime - arcOnTime} minutes`;
                             }
                         }
                     }

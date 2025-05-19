@@ -174,7 +174,7 @@ class Recap extends BaseController
         }
 
         // Prepare the SQL query to fetch data for all machines based on the provided date
-        $sql = "SELECT m.MachineID, mh.ArcOn, mh.ArcOff 
+        $sql = "SELECT m.MachineID, mh.ArcOn, mh.ArcOff, mh.State 
             FROM machine m
             JOIN machinehistory1 mh ON m.MachineID = mh.MachineID
             WHERE mh.Date = ?";
@@ -192,7 +192,8 @@ class Recap extends BaseController
         while ($row = $result->fetch_assoc()) {
             $data[$row['MachineID']][] = [
                 'ArcOn' => $row['ArcOn'],
-                'ArcOff' => $row['ArcOff']
+                'ArcOff' => $row['ArcOff'],
+                'State' => $row['State'] ?? null
             ];
         }
 
