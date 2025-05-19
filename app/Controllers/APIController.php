@@ -395,9 +395,9 @@ class APIController extends BaseController
                 // Set all ledstate ledStatus to false
                 $db->query("UPDATE ledstate SET ledStatus = 'false'");
 
-                // First check for any unfinished MAINTENANCE, TOOLING, or SETUP states
-                $builder = $db->table($tableHistory);
-                $unfinishedState = $builder->select('id, ArcOn')
+                // First check for any unfinished MAINTENANCE, TOOLING, or SETUP states in additionalhistory
+                $addHistoryBuilder = $db->table('additionalhistory');
+                $unfinishedState = $addHistoryBuilder->select('id, ArcOn')
                     ->where('MachineID', $MachineID)
                     ->where('Area', $Area)
                     ->whereIn('State', ['MAINTENANCE', 'TOOLING', 'SETUP'])
@@ -412,16 +412,9 @@ class APIController extends BaseController
                     $ArcTotal = date_diff(date_create($unfinishedState->ArcOn), date_create($Time))->format('%H:%I:%S');
 
                     // Update the unfinished state with ArcOff time
-                    $builder->where('id', $unfinishedState->id)->update([
+                    $addHistoryBuilder->where('id', $unfinishedState->id)->update([
                         'ArcOff' => $Time,
                         'ArcTotal' => $ArcTotal
-                    ]);
-
-                    // Also update the area table to IDLE state
-                    $areaBuilder = $db->table($tableArea);
-                    $areaBuilder->where('MachineID', $MachineID)->update([
-                        'State' => 'IDLE',
-                        'lastBeat' => $DateTime
                     ]);
                 }
 
@@ -499,9 +492,9 @@ class APIController extends BaseController
                 // Set all ledstate ledStatus to false
                 $db->query("UPDATE ledstate SET ledStatus = 'false'");
 
-                // First check for any unfinished MAINTENANCE, TOOLING, or SETUP states
-                $builder = $db->table($tableHistory);
-                $unfinishedState = $builder->select('id, ArcOn')
+                // First check for any unfinished MAINTENANCE, TOOLING, or SETUP states in additionalhistory
+                $addHistoryBuilder = $db->table('additionalhistory');
+                $unfinishedState = $addHistoryBuilder->select('id, ArcOn')
                     ->where('MachineID', $MachineID)
                     ->where('Area', $Area)
                     ->whereIn('State', ['MAINTENANCE', 'TOOLING', 'SETUP'])
@@ -516,21 +509,16 @@ class APIController extends BaseController
                     $ArcTotal = date_diff(date_create($unfinishedState->ArcOn), date_create($Time))->format('%H:%I:%S');
 
                     // Update the unfinished state with ArcOff time
-                    $builder->where('id', $unfinishedState->id)->update([
+                    $addHistoryBuilder->where('id', $unfinishedState->id)->update([
                         'ArcOff' => $Time,
                         'ArcTotal' => $ArcTotal
                     ]);
-
-                    // Also update the area table to IDLE state
-                    $areaBuilder = $db->table($tableArea);
-                    $areaBuilder->where('MachineID', $MachineID)->update([
-                        'State' => 'IDLE',
-                        'lastBeat' => $DateTime
-                    ]);
                 }
 
-                // Handle ArcCheck
-                $querySelect = $builder->select('id, ArcTotal')
+                // Handle ArcCheck on the correct machinehistory table
+                $machineHistoryTable = $Area == "1" ? "machinehistory1" : "machinehistory2";
+                $machineHistoryBuilder = $db->table($machineHistoryTable);
+                $querySelect = $machineHistoryBuilder->select('id, ArcTotal')
                     ->where('MachineID', $MachineID)
                     ->where('Area', $Area)
                     ->orderBy('id', 'DESC')
@@ -550,7 +538,7 @@ class APIController extends BaseController
                         'ArcTotal' => $newArcTotal,
                         'ArcCheck' => $Time
                     ];
-                    $builder->where('id', $id)->update($dataUpdateArcCheck);
+                    $machineHistoryBuilder->where('id', $id)->update($dataUpdateArcCheck);
 
                     return $this->response->setBody('ArcTotal and ArcCheck successfully updated');
                 } else {

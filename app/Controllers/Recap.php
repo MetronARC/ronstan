@@ -166,47 +166,55 @@ class Recap extends BaseController
     {
         // Get the date from the request
         $input = $this->request->getJSON();
-        $date = $input->date ?? ''; // Get the date from the JSON input
+        $date = $input->date ?? '';
 
-        // Check if the date is empty
         if (empty($date)) {
             return $this->response->setJSON(['error' => 'Date is required'])->setStatusCode(400);
         }
 
-        // Prepare the SQL query to fetch data for all machines based on the provided date
-        $sql = "SELECT m.MachineID, mh.ArcOn, mh.ArcOff, mh.State 
-            FROM machine m
-            JOIN machinehistory1 mh ON m.MachineID = mh.MachineID
-            WHERE mh.Date = ?";
-
-        // Prepare the statement
-        $stmt = $this->db->connID->prepare($sql);
-        $stmt->bind_param("s", $date); // Bind the date parameter
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        // Initialize an array to hold the data
         $data = [];
 
-        // Fetch the results and structure them
-        while ($row = $result->fetch_assoc()) {
+        // 1. Fetch 'ON' states from machinehistory1
+        $sql1 = "SELECT m.MachineID, mh.ArcOn, mh.ArcOff, mh.State
+            FROM machine m
+            JOIN machinehistory1 mh ON m.MachineID = mh.MachineID
+            WHERE mh.Date = ? AND UPPER(mh.State) = 'ON'";
+        $stmt1 = $this->db->connID->prepare($sql1);
+        $stmt1->bind_param("s", $date);
+        $stmt1->execute();
+        $result1 = $stmt1->get_result();
+        while ($row = $result1->fetch_assoc()) {
             $data[$row['MachineID']][] = [
                 'ArcOn' => $row['ArcOn'],
                 'ArcOff' => $row['ArcOff'],
                 'State' => $row['State'] ?? null
             ];
         }
+        $stmt1->close();
 
-        // Close the statement
-        $stmt->close();
+        // 2. Fetch 'MAINTENANCE', 'SETUP', 'TOOLING' from additionalhistory
+        $sql2 = "SELECT m.MachineID, ah.ArcOn, ah.ArcOff, ah.State
+            FROM machine m
+            JOIN additionalhistory ah ON m.MachineID = ah.MachineID
+            WHERE ah.Date = ? AND UPPER(ah.State) IN ('MAINTENANCE', 'SETUP', 'TOOLING')";
+        $stmt2 = $this->db->connID->prepare($sql2);
+        $stmt2->bind_param("s", $date);
+        $stmt2->execute();
+        $result2 = $stmt2->get_result();
+        while ($row = $result2->fetch_assoc()) {
+            $data[$row['MachineID']][] = [
+                'ArcOn' => $row['ArcOn'],
+                'ArcOff' => $row['ArcOff'],
+                'State' => $row['State'] ?? null
+            ];
+        }
+        $stmt2->close();
 
-        // Include the received date in the response
+        // Return merged data
         $response = [
             'date' => $date,
             'data' => $data
         ];
-
-        // Return the response as JSON
         return $this->response->setJSON($response);
     }
 }

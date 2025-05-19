@@ -54,12 +54,12 @@ class AdditionalAPI extends BaseController
         // Handle different areas
         if ($Area == "1" || $Area == "2") {
             $tableArea = $Area == "1" ? "area1" : "area2";
-            $tableHistory = $Area == "1" ? "machinehistory1" : "machinehistory2";
+            $tableHistory = $Area == "1" ? "additionalhistory" : "machinehistory2";
 
             if ($Status == "maintenanceOn") {
                 // Update LED state for maintenance ON
                 $ledBuilder = $db->table('ledstate');
-                $ledBuilder->where('State', 'maintenance')->update(['ledStatus' => 1]);
+                $ledBuilder->where('State', 'maintenance')->where('MachineID', $MachineID)->update(['ledStatus' => 1]);
 
                 // Insert into machine history for ArcOn
                 $builder = $db->table($tableHistory);
@@ -93,7 +93,7 @@ class AdditionalAPI extends BaseController
             } else if ($Status == "maintenanceOff") {
                 // Update LED state for maintenance OFF
                 $ledBuilder = $db->table('ledstate');
-                $ledBuilder->where('State', 'maintenance')->update(['ledStatus' => 0]);
+                $ledBuilder->where('State', 'maintenance')->where('MachineID', $MachineID)->update(['ledStatus' => 0]);
 
                 // Fetch the ArcOn time to calculate ArcTotal
                 $builder = $db->table($tableHistory);
@@ -136,7 +136,7 @@ class AdditionalAPI extends BaseController
             } else if ($Status == "toolingOn") {
                 // Update LED state for tooling ON
                 $ledBuilder = $db->table('ledstate');
-                $ledBuilder->where('State', 'tooling')->update(['ledStatus' => 1]);
+                $ledBuilder->where('State', 'tooling')->where('MachineID', $MachineID)->update(['ledStatus' => 1]);
 
                 // Insert into machine history for Tooling
                 $builder = $db->table($tableHistory);
@@ -170,7 +170,7 @@ class AdditionalAPI extends BaseController
             } else if ($Status == "toolingOff") {
                 // Update LED state for tooling OFF
                 $ledBuilder = $db->table('ledstate');
-                $ledBuilder->where('State', 'tooling')->update(['ledStatus' => 0]);
+                $ledBuilder->where('State', 'tooling')->where('MachineID', $MachineID)->update(['ledStatus' => 0]);
 
                 // Fetch the ArcOn time to calculate ArcTotal
                 $builder = $db->table($tableHistory);
@@ -209,7 +209,7 @@ class AdditionalAPI extends BaseController
             } else if ($Status == "setupOn") {
                 // Update LED state for setup ON
                 $ledBuilder = $db->table('ledstate');
-                $ledBuilder->where('State', 'setup')->update(['ledStatus' => 1]);
+                $ledBuilder->where('State', 'setup')->where('MachineID', $MachineID)->update(['ledStatus' => 1]);
 
                 // Insert into machine history for Setup
                 $builder = $db->table($tableHistory);
@@ -243,7 +243,7 @@ class AdditionalAPI extends BaseController
             } else if ($Status == "setupOff") {
                 // Update LED state for setup OFF
                 $ledBuilder = $db->table('ledstate');
-                $ledBuilder->where('State', 'setup')->update(['ledStatus' => 0]);
+                $ledBuilder->where('State', 'setup')->where('MachineID', $MachineID)->update(['ledStatus' => 0]);
 
                 // Fetch the ArcOn time to calculate ArcTotal
                 $builder = $db->table($tableHistory);
@@ -316,8 +316,8 @@ class AdditionalAPI extends BaseController
 
     public function getLedStatus()
     {
-
         $apiKey = $this->request->getGet('apiKey');
+        $MachineID = $this->request->getGet('MachineID');
 
         if ($apiKey !== $this->apiKey) {
             return $this->response->setStatusCode(400)->setBody("API key invalid.");
@@ -326,8 +326,8 @@ class AdditionalAPI extends BaseController
         // Load the database connection
         $db = \Config\Database::connect();
         
-        // Query the ledState table
-        $query = $db->table('ledstate')->get();
+        // Query the ledState table with MachineID filter
+        $query = $db->table('ledstate')->where('MachineID', $MachineID)->get();
         $results = $query->getResult();
         
         // Initialize the response array
