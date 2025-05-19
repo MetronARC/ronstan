@@ -10,12 +10,12 @@
         <span class="legend-label">Production</span>
     </div>
     <div class="legend-item">
-        <span class="legend-color" style="background-color: #FFEA00;"></span>
-        <span class="legend-label">IDLE</span>
-    </div>
-    <div class="legend-item">
         <span class="legend-color" style="background-color: #2196F3;"></span>
         <span class="legend-label">MAINTENANCE</span>
+    </div>
+    <div class="legend-item">
+        <span class="legend-color" style="background-color: #FFEA00;"></span>
+        <span class="legend-label">SETUP</span>
     </div>
     <div class="legend-item">
         <span class="legend-color" style="background-color: #FFFFFF; border: 1px solid #BDBDBD;"></span>
@@ -23,7 +23,7 @@
     </div>
     <div class="legend-item">
         <span class="legend-color" style="background-color:#383838;"></span>
-        <span class="legend-label">Other</span>
+        <span class="legend-label">DOWN-TIME</span>
     </div>
 </div>
 
