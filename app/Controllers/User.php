@@ -13,18 +13,6 @@ class User extends BaseController
 
     public function index(): string
     {
-        // Update ArcOff and ArcTotal for NULL ArcOff records
-        $this->db->query("
-            UPDATE machinehistory1
-            SET 
-                ArcOff = ArcCheck,
-                ArcTotal = SEC_TO_TIME(
-                    TIME_TO_SEC(ArcCheck) - TIME_TO_SEC(ArcOn) +
-                    IF(TIME_TO_SEC(ArcCheck) < TIME_TO_SEC(ArcOn), 86400, 0)
-                )
-            WHERE ArcOff IS NULL
-        ");
-
         // Initialize variables for Active Machine Count
         $totalRowCount = 0;
 
